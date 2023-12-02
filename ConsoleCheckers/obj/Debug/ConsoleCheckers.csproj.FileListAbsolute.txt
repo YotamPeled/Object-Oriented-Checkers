@@ -1,0 +1,7 @@
+D:\Console Checkers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe.config
+D:\Console Checkers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe
+D:\Console Checkers\ConsoleCheckers\bin\Debug\ConsoleCheckers.pdb
+D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.AssemblyReference.cache
+D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CoreCompileInputs.cache
+D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.exe
+D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.pdb
