@@ -5,92 +5,75 @@ namespace ConsoleCheckers
 {
     public static class PieceMethods
     {
-        public static LinkedList<int> GenerateLegalMoves(Board i_Board, ePieces i_Piece, int i_PieceLocation)
+        public static ICollection<int> GiveLegalMoves(Board i_Board, ePieces i_Piece, int i, int j)
         {
-            LinkedList<int> legalMoves = new LinkedList<int>();
+            ICollection<int> legalMoves = null;
+
             switch (i_Piece)
             {
                 case ePieces.None:
                     break;
                 case ePieces.sWhite:
-                    wSoliderMoves(i_Board, i_PieceLocation, legalMoves);
+                    legalMoves = SoliderMoves(i_Board, i, j, -1, ePieces.sBlack);
                     break;
                 case ePieces.sBlack:
-                    bSoliderMoves(i_Board, i_PieceLocation, legalMoves);
+                    legalMoves = SoliderMoves(i_Board, i, j, 1, ePieces.sWhite);
                     break;
                 case ePieces.qWhite:
-                    wQueenMoves(i_Board, i_PieceLocation, legalMoves);
+                    legalMoves = wQueenMoves(i_Board, i, j);
                     break;
                 case ePieces.qBlack:
-                    bQueenMoves(i_Board, i_PieceLocation, legalMoves);
+                    legalMoves = bQueenMoves(i_Board, i, j);
                     break;
             }
 
             return legalMoves;
         }
 
-        private static void bQueenMoves(Board i_Board, int i_PieceLocation, LinkedList<int> legalMoves)
+        private static ICollection<int> bQueenMoves(Board i_Board, int i, int j)
         {
-
+            throw new NotImplementedException();
         }
 
-        private static void wQueenMoves(Board i_Board, int i_PieceLocation, LinkedList<int> legalMoves)
+        private static ICollection<int> wQueenMoves(Board i_Board, int i, int j)
         {
-
+            throw new NotImplementedException();
         }
 
-        private static void bSoliderMoves(Board i_Board, int i_PieceLocation, LinkedList<int> legalMoves)
+        private static ICollection<int> SoliderMoves(Board i_Board, int i, int j, int i_Direction, ePieces i_Captureable)
         {
+            List<int> legalMoves = new List<int>();
+            bool isRightCaptureable = CheckValid(i + (1 * i_Direction), j + 1) && CheckValid(i + (2 * i_Direction), j + 2) &&
+                                      i_Board[i + (1* i_Direction), j + 1] == i_Captureable && i_Board[i + (2 * i_Direction), j + 2] == ePieces.None;
+            bool isLeftCaptureable = CheckValid(i + (1 * i_Direction), j - 1) && CheckValid(i + (2 * i_Direction), j - 2) && 
+                                     i_Board[i + (1 * i_Direction), j - 1] == i_Captureable && i_Board[i + (2 * i_Direction), j - 2] == ePieces.None;
 
-        }
-
-        private static void wSoliderMoves(Board i_Board, int i_PieceLocation, LinkedList<int> i_LegalMoves)
-        {
-            if (i_PieceLocation % 10 == 9 || i_PieceLocation % 10 == 8 || i_PieceLocation / 10 == -1 ||
-                i_PieceLocation / 10 == 8)
+            if (isRightCaptureable || isLeftCaptureable)
             {
-                return;
-            }
-
-            bool isCaptured = false;
-            int i = i_PieceLocation / 10;
-            int j = i_PieceLocation % 10;
-            if (CheckValid(i - 1, j - 1))
-            {
-                if(i_Board[i - 1, j - 1] == ePieces.None)
+                if (isRightCaptureable)
                 {
-                    i_LegalMoves.AddLast(i_PieceLocation - 11);
+                    legalMoves.Add(CoordinateToInt(i + (2 * i_Direction), j + 2));
                 }
-                else if (i_Board[i - 1, j - 1] == ePieces.sBlack || i_Board[i - 1, j - 1] == ePieces.qBlack)
+
+                if(isLeftCaptureable)
                 {
-                    if(CheckValid(i - 2, j - 2) && i_Board[i - 2, j - 2] == ePieces.None)
-                    {
-                        i_LegalMoves.AddLast(i_PieceLocation - 22);
-                        isCaptured = true;
-                    }
+                    legalMoves.Add(CoordinateToInt(i + (2 * i_Direction), j - 2));
                 }
             }
-
-            if (CheckValid(i - 1, j + 1))
+            else
             {
-                if (!isCaptured && i_Board[i - 1, j + 1] == ePieces.None)
+                if (CheckValid(i + (1 * i_Direction), j + 1) && i_Board[i + (1 * i_Direction), j + 1] == ePieces.None)
                 {
-                    i_LegalMoves.AddLast(i_PieceLocation - 9);
+                    legalMoves.Add(CoordinateToInt(i + (1 * i_Direction), j + 1));
                 }
-                else if (i_Board[i - 1, j + 1] == ePieces.sBlack || i_Board[i - 1, j + 1] == ePieces.qBlack)
+                
+                if(CheckValid(i + (1 * i_Direction), j - 1) && i_Board[i + (1 * i_Direction), j - 1] == ePieces.None)
                 {
-                    if (CheckValid(i - 2, j + 2) && i_Board[i - 2, j + 2] == ePieces.None)
-                    {
-                        if (!isCaptured)
-                        {
-                            i_LegalMoves.Clear();
-                        }
-
-                        i_LegalMoves.AddLast(i_PieceLocation - 18);
-                    }
+                    legalMoves.Add(CoordinateToInt(i + (1 * i_Direction), j - 1));
                 }
             }
-            
+
+            return legalMoves;
         }
 
         public static bool CheckValid(int i, int j)

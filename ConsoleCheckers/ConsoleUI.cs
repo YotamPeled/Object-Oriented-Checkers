@@ -6,9 +6,63 @@ using System.Threading.Tasks;
 
 namespace ConsoleCheckers
 {
-    internal static class ConsoleUI
+    internal class ConsoleUI
     {
-        internal static void PrintBoard(Board i_Board)
+        private Board m_Board;
+        private List<int> m_SelectedSquares = new List<int>();
+        
+        public ConsoleUI(Board i_Board)
+        {
+            m_Board = i_Board;
+            i_Board.MadeMove += OnMadeMove;
+            PrintBoard();
+        }
+
+        public bool Select(int i_SquareToSelect)
+        {
+            bool added = false;
+            int i;
+            int j; 
+
+            PieceMethods.IntToCoordinate(i_SquareToSelect, out i, out j);
+            ICollection<int> toSelect =  m_Board.GenerateLegalMoves(i, j);
+            toSelect.Add(i_SquareToSelect);
+
+            foreach(int square in toSelect)
+            {
+                PieceMethods.IntToCoordinate(square, out i, out j);
+                if (PieceMethods.CheckValid(i, j) && !m_SelectedSquares.Contains(square))
+                {
+                    m_SelectedSquares.Add(square);
+                    added = true;
+                }
+            }
+            
+            if (added)
+            {
+                PrintBoard();
+            }
+
+            return added;
+        }
+
+        public void ClearHighlights()
+        {
+            
+            m_SelectedSquares.Clear();
+            PrintBoard();
+        }
+
+        protected virtual void OnMadeMove(int iFrom, int jFrom, int iTo, int jTo)
+        {
+            m_SelectedSquares.Clear();
+            m_SelectedSquares.Add(PieceMethods.CoordinateToInt(iFrom, jFrom));
+            m_SelectedSquares.Add(PieceMethods.CoordinateToInt(iTo, jTo));
+
+            PrintBoard();
+        }
+
+        internal void PrintBoard()
         {
             Console.Clear();
             printRow();
@@ -22,14 +76,20 @@ namespace ConsoleCheckers
                     {
                         Console.BackgroundColor = ConsoleColor.White;
                     }
-                    printPiece(i_Board[i, j]);
+
+                    if (m_SelectedSquares.Contains(PieceMethods.CoordinateToInt(i, j)))
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    }
+                    
+                    printPiece(m_Board[i, j]);
                     printSpacing();
                 }
                 Console.WriteLine();         
             }
         }
 
-        private static void printPiece(ePieces i_Piece)
+        private void printPiece(ePieces i_Piece)
         {
             switch(i_Piece)
             {
@@ -48,24 +108,16 @@ namespace ConsoleCheckers
                 case ePieces.qBlack:
                     Console.Write('B');
                     break;
-                case ePieces.Highlight:
-                    Console.BackgroundColor = ConsoleColor.DarkBlue;
-                    Console.Write(' ');
-                    break;
-                case ePieces.HighlightFrom:
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.Write(' ');
-                    break;
             }
         }
 
-        private static void printSpacing()
+        private void printSpacing()
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write('|');
         }
 
-        private static void printRow()
+        private void printRow()
         {
             Console.WriteLine("  0 1 2 3 4 5 6 7");
         }

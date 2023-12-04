@@ -4,7 +4,5 @@
     sWhite,
     sBlack,
     qWhite,
-    qBlack,
-    Highlight,
-    HighlightFrom
+    qBlack
 }

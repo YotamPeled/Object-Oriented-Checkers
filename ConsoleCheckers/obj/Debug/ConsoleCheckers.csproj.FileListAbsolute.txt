@@ -5,3 +5,11 @@ D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.AssemblyRef
 D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CoreCompileInputs.cache
 D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.exe
 D:\Console Checkers\ConsoleCheckers\obj\Debug\ConsoleCheckers.pdb
+C:\Design Patterns\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe.config
+C:\Design Patterns\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe
+C:\Design Patterns\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.pdb
+C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.AssemblyReference.cache
+C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.SuggestedBindingRedirects.cache
+C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CoreCompileInputs.cache
+C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.exe
+C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.pdb
