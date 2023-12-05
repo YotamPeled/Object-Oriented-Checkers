@@ -13,3 +13,10 @@ C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.cs
 C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CoreCompileInputs.cache
 C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.exe
 C:\Design Patterns\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.pdb
+D:\Console Checkers\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe.config
+D:\Console Checkers\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.exe
+D:\Console Checkers\completeCheckers\ConsoleCheckers\bin\Debug\ConsoleCheckers.pdb
+D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.AssemblyReference.cache
+D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CoreCompileInputs.cache
+D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.exe
+D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.pdb

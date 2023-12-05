@@ -8,30 +8,43 @@ namespace ConsoleCheckers
 {
     static class PositionInitializer
     {
-        public static void Starting(ePieces[,] i_Board)
+        public static void Starting(Board i_Board)
         {
-            if (i_Board.GetLength(0) != 8 || i_Board.GetLength(1) != 8)
+            int n = 24; 
+            List<Tuple<int, int>> pairs = generatePairs(n);
+         
+            foreach (var pair in pairs)
             {
-                throw new Exception("board dimensions aren't corrent");
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
+                if (pair.Item1 < 3)
                 {
-                    if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0))
-                    {
-                        if (i < 3)
-                        {
-                            i_Board[i, j] = ePieces.sBlack;
-                        }
-                        else if (i > 4)
-                        {
-                            i_Board[i, j] = ePieces.sWhite;
-                        }
-                    }
+                    i_Board[pair.Item1, pair.Item2] = ePiece.sBlack;
+                    i_Board.BitBoards[(int)ePiece.sBlack - 1] >>= 1;
+                    i_Board.BitBoards[(int)ePiece.sBlack - 1] |= 1U << 31;
+                }
+                else 
+                {
+                    i_Board[pair.Item1, pair.Item2] = ePiece.sWhite;
+                    i_Board.BitBoards[(int)ePiece.sWhite - 1] <<= 1;
+                    i_Board.BitBoards[(int)ePiece.sWhite - 1] |= 1;
                 }
             }
+        }
+
+        static List<Tuple<int, int>> generatePairs(int n)
+        {
+            List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+
+            for (int i = 0; i < n; i++)
+            {
+                int first, second;
+
+                first = i / 4 < 3 ? i / 4 : i / 4 + 2;
+                second = first % 2 == 0 ? i % 4 * 2 + 1 : i % 4 * 2;
+
+                result.Add(new Tuple<int, int>(first, second));
+            }
+
+            return result;
         }
     }
 }

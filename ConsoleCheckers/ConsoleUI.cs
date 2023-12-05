@@ -10,7 +10,6 @@ namespace ConsoleCheckers
     {
         private Board m_Board;
         private List<int> m_SelectedSquares = new List<int>();
-        
         public ConsoleUI(Board i_Board)
         {
             m_Board = i_Board;
@@ -20,35 +19,28 @@ namespace ConsoleCheckers
 
         public bool Select(int i_SquareToSelect)
         {
-            bool added = false;
-            int i;
-            int j; 
+            bool legalSelection = false;
 
-            PieceMethods.IntToCoordinate(i_SquareToSelect, out i, out j);
-            ICollection<int> toSelect =  m_Board.GenerateLegalMoves(i, j);
-            toSelect.Add(i_SquareToSelect);
-
-            foreach(int square in toSelect)
+            foreach(Move legalMove in m_Board.LegalMoves)
             {
-                PieceMethods.IntToCoordinate(square, out i, out j);
-                if (PieceMethods.CheckValid(i, j) && !m_SelectedSquares.Contains(square))
+                if (PieceMethods.UIntToInt(legalMove.Origin) == i_SquareToSelect)
                 {
-                    m_SelectedSquares.Add(square);
-                    added = true;
+                    m_SelectedSquares.Add(PieceMethods.UIntToInt(legalMove.Destination));
+                    legalSelection = true;
                 }
             }
-            
-            if (added)
+
+            if (legalSelection)
             {
-                PrintBoard();
+                m_SelectedSquares.Add(i_SquareToSelect);
             }
 
-            return added;
+            PrintBoard();
+            return legalSelection;
         }
 
         public void ClearHighlights()
         {
-            
             m_SelectedSquares.Clear();
             PrintBoard();
         }
@@ -89,23 +81,23 @@ namespace ConsoleCheckers
             }
         }
 
-        private void printPiece(ePieces i_Piece)
+        private void printPiece(ePiece i_Piece)
         {
             switch(i_Piece)
             {
-                case ePieces.None:
+                case ePiece.None:
                     Console.Write(' ');
                     break;
-                case ePieces.sWhite:
+                case ePiece.sWhite:
                     Console.Write('w');
                     break;
-                case ePieces.sBlack:
+                case ePiece.sBlack:
                     Console.Write('b');
                     break;
-                case ePieces.qWhite:
+                case ePiece.qWhite:
                     Console.Write('W');
                     break;
-                case ePieces.qBlack:
+                case ePiece.qBlack:
                     Console.Write('B');
                     break;
             }

@@ -9,17 +9,33 @@ namespace ConsoleCheckers
 {
     public class Board
     {
-        private ePieces[,] m_Board;
-        private eTurn m_Turn = eTurn.White;
-        public eTurn Turn 
+        private List<Move> m_LegalMoves = new List<Move>();
+        public List<Move> LegalMoves
         {
             get
             {
-                return m_Turn;
+                return m_LegalMoves;
+            }
+        }
+        private uint[] m_BitBoards;
+        public uint[] BitBoards 
+        {
+            get
+            {
+                return m_BitBoards;
+            }
+        }
+        private ePiece[,] m_Board;
+        private eColor m_ColorTurn = eColor.White;
+        public eColor Turn 
+        {
+            get
+            {
+                return m_ColorTurn;
             }
         }
         public event Action<int, int, int, int> MadeMove;
-        public ePieces this[int i, int j]
+        public ePiece this[int i, int j]
         {
             get
             {
@@ -46,11 +62,13 @@ namespace ConsoleCheckers
         }
         public Board()
         {
-            m_Board = new ePieces[8,8];
-            PositionInitializer.Starting(m_Board);
+            m_BitBoards = new uint[4];
+            m_Board = new ePiece[8,8];
+            PositionInitializer.Starting(this);
+            GenerateLegalMoves();
         }
 
-        private IEnumerable<int> FindCells(Func<ePieces, bool> condition)
+        private IEnumerable<int> FindCells(Func<ePiece, bool> condition)
         {
             for (int i = 0; i < m_Board.GetLength(0); i++)
             {
@@ -64,79 +82,25 @@ namespace ConsoleCheckers
             }
         }
 
-        public ICollection<int> GenerateLegalMoves(int i, int j)
-        {
-            bool legalSquare;
-            try
-            {  
-                legalSquare = this[i, j] != ePieces.None;
-            }
-            catch
-            {
-                legalSquare = false;
-            }
-
-            if (legalSquare)
-            {
-                return PieceMethods.GiveLegalMoves(this, this[i, j], i, j);
-            }
-
-            return null;
+        public void GenerateLegalMoves()
+        {  
+            m_LegalMoves = PieceMethods.GiveLegalMoves(BitBoards, m_ColorTurn);
         }
 
         public bool MakeMove(int i_From, int i_To)
         {
-            bool legalMove = false;
-            int iFrom = i_From / 10;
-            int jFrom = i_From % 10;
-            int iTo = i_To / 10;
-            int jTo = i_To % 10;
-
-            ICollection<int> legalMoves = GenerateLegalMoves(iFrom, jFrom);
-            if (legalMoves.Contains(iTo * 10 + jTo))
-            {
-                legalMove = true;
-            }
-
-            if(legalMove)
-            {
-                this[iTo, jTo] = this[iFrom, jFrom];
-                this[iFrom, jFrom] = ePieces.None;
-                MadeMove.Invoke(iFrom, jFrom, iTo, jTo);
-                SwapTurn();
-            }
-
-            return legalMove;
+            return false;
         }
 
-        internal bool IsSquareInPlay(int intInput)
+        internal bool IsSquareInPlay(int i_Square)
         {
             bool isSquareInPlay = false;
-            int i;
-            int j;
-            PieceMethods.IntToCoordinate(intInput, out i, out j);
-
-            if (m_Turn == eTurn.White)
+            foreach(Move move in LegalMoves)
             {
-                try
+                if (PieceMethods.UIntToInt(move.Origin) == i_Square)
                 {
-                    isSquareInPlay = this[i, j] == ePieces.sWhite || this[i, j] == ePieces.qWhite;
-                }
-                catch
-                {
-                    isSquareInPlay = false;
-                }
-                    
-            }
-            else if (m_Turn == eTurn.Black)
-            {
-                try
-                {
-                    isSquareInPlay = this[i, j] == ePieces.sBlack || this[i, j] == ePieces.qBlack;
-                }
-                catch
-                {
-                    isSquareInPlay = false;
+                    isSquareInPlay = true;
+                    break;
                 }
             }
 
@@ -145,13 +109,13 @@ namespace ConsoleCheckers
 
         private void SwapTurn()
         {
-            if (m_Turn == eTurn.White)
+            if (m_ColorTurn == eColor.White)
             {
-                m_Turn = eTurn.Black;
+                m_ColorTurn = eColor.Black;
             }
             else
             {
-                m_Turn = eTurn.White;
+                m_ColorTurn = eColor.White;
             }
         }
     }

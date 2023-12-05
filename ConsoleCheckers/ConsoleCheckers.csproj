@@ -43,11 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitUtils.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="ConsoleUI.cs" />
-    <Compile Include="eTurn.cs" />
+    <Compile Include="eColor.cs" />
+    <Compile Include="Move.cs" />
     <Compile Include="PieceMethods.cs" />
-    <Compile Include="Pieces.cs" />
+    <Compile Include="ePiece.cs" />
     <Compile Include="PositionInitializer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

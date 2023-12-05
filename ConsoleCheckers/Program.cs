@@ -11,7 +11,12 @@ namespace ConsoleCheckers
         static void Main(string[] args)
         {
             Board gameBoard = new Board();
+            foreach(uint bit in BitUtils.GetSetBits(gameBoard.BitBoards[1]))
+            {
+                Console.WriteLine(BitUtils.ToBitString(bit));
+            }
 
+            Console.Read();
             ConsoleUI UI = new ConsoleUI(gameBoard);
             string input = Console.ReadLine();
             bool isSquareSelected = false;
