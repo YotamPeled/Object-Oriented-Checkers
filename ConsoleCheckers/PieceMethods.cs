@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleCheckers
 {
@@ -27,7 +28,6 @@ namespace ConsoleCheckers
             uint queens;
 
             allocateBitBoards(i_Color, i_BitBoards, out friendlyPieces, out opposingPieces, out soliders, out queens);
-            // iterate through all soliders
             foreach (uint piece in BitUtils.GetSetBits(soliders))
             {
                 int piecePosition = BitUtils.FindBitPosition(piece) % 8;
@@ -54,6 +54,60 @@ namespace ConsoleCheckers
                 if (!isCaptureTurn && moveRight != null)
                 {
                     normalMoveCheck(piece, friendlyPieces | opposingPieces, moveRight, movesList);
+                }
+            }
+
+            foreach (uint queen in BitUtils.GetSetBits(queens))
+            {
+                foreach (IEnumerable<uint> queenMovesIterator in ShiftingFunctionsFactory.GetQueenIterators(queen))
+                {
+                    uint captureablePiece = 0;
+                    foreach (uint piece in queenMovesIterator)
+                    {
+                        if (((friendlyPieces | opposingPieces) & piece) == 0) // empty square check
+                        {
+                            if (captureablePiece != 0)
+                            {
+                                if (!isCaptureTurn) // clear all none capture moves
+                                {
+                                    movesList.Clear();
+                                    isCaptureTurn = true;
+                                }
+
+                                movesList.Add(new Move()
+                                {
+                                    IsCapture = true,
+                                    Origin = queen,
+                                    Capture = captureablePiece,
+                                    Destination = piece
+                                });
+
+                                break;
+                            }
+                            else if (!isCaptureTurn)
+                            {
+                                movesList.Add(new Move()
+                                {
+                                    IsCapture = false,
+                                    Origin = queen,
+                                    Destination = piece
+                                });
+                            }
+                        }
+                        else if ((opposingPieces & piece) != 0) //enemy piece seen
+                        {
+                            if (captureablePiece != 0) // 2 black pieces in a row seen
+                            {
+                                break;
+                            }
+
+                            captureablePiece = piece;
+                        }
+                        else //reached a friendly piece
+                        {
+                            break;
+                        }
+                    }
                 }
             }
 

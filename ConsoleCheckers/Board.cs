@@ -64,7 +64,7 @@ namespace ConsoleCheckers
         {
             m_BitBoards = new uint[4];
             m_Board = new ePiece[8,8];
-            PositionInitializer.Starting(this);
+            PositionInitializer.randomQueen(this);
             GenerateLegalMoves();
         }
 

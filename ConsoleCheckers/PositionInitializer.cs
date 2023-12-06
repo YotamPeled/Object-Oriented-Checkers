@@ -30,6 +30,28 @@ namespace ConsoleCheckers
             }
         }
 
+        public static void randomQueen(Board i_Board)
+        {
+            int n = 24;
+            List<Tuple<int, int>> pairs = generatePairs(n);
+
+            foreach (var pair in pairs)
+            {
+                if (pair.Item1 < 3)
+                {
+                    i_Board[pair.Item1, pair.Item2] = ePiece.qBlack;
+                    i_Board.BitBoards[(int)ePiece.qBlack - 1] >>= 1;
+                    i_Board.BitBoards[(int)ePiece.qBlack - 1] |= 1U << 31;
+                }
+                else
+                {
+                    i_Board[pair.Item1, pair.Item2] = ePiece.qWhite;
+                    i_Board.BitBoards[(int)ePiece.qWhite - 1] <<= 1;
+                    i_Board.BitBoards[(int)ePiece.qWhite - 1] |= 1;
+                }
+            }
+        }
+
         static List<Tuple<int, int>> generatePairs(int n)
         {
             List<Tuple<int, int>> result = new List<Tuple<int, int>>();
