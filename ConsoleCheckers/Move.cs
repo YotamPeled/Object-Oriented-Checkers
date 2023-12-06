@@ -9,6 +9,7 @@ namespace ConsoleCheckers
     public struct Move
     {
         public bool IsCapture { get; set; }
+        public uint Capture { get; set; }
         public uint Origin { get; set; }
         public uint Destination { get; set; }
     }

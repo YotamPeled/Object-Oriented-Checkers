@@ -7,164 +7,97 @@ namespace ConsoleCheckers
     {
         public static List<Move> GiveLegalMoves(uint[] i_BitBoards, eColor i_ColorToMove)
         {
-            List<Move> moveList;
-            if (i_ColorToMove == eColor.White)
-            {
-                moveList = WhiteMoves(i_BitBoards);
-            }
-            else
-            {
-                moveList = BlackMoves(i_BitBoards);
-            }
-            //Force captures
-            bool isCapture = false;
-            foreach (Move move in moveList)
-            {
-                if (move.IsCapture)
-                {
-                    isCapture = true;
-                    break;
-                }
-            }
-
-            if (isCapture)
-            {
-                foreach (Move move in moveList)
-                {
-                    if (!move.IsCapture)
-                    {
-                        moveList.Remove(move);
-                    }
-                }
-            }
-
+            List<Move> moveList;          
+            moveList = Moves(i_BitBoards, i_ColorToMove);
+            
             return moveList;
         }
 
-        private static List<Move> WhiteMoves(uint[] i_BitBoards)
+        private static List<Move> Moves(uint[] i_BitBoards, eColor i_Color)
         {
             List<Move> movesList = new List<Move>();
-            uint whitePieces = i_BitBoards[0]; // add queens with || i_BitBoards[2]
-            uint blackPieces = i_BitBoards[1]; // add queens with || i_BitBoards[3]
-            Func<uint, uint> shiftFive = (number) => { return number << 5; };
-            Func<uint, uint> shiftFour = (number) => { return number << 4; };
-            Func<uint, uint> shiftThree = (number) => { return number << 3; };
-            foreach (uint piece in BitUtils.GetSetBits(whitePieces))
+            Func<uint, uint> moveLeft;
+            Func<uint, uint> moveRight;
+            Func<uint, uint> captureLeft;
+            Func<uint, uint> captureRight;
+            bool isCaptureTurn = false;
+            uint friendlyPieces;
+            uint opposingPieces;
+            uint soliders;
+            uint queens;
+
+            allocateBitBoards(i_Color, i_BitBoards, out friendlyPieces, out opposingPieces, out soliders, out queens);
+
+             // Force Captures, if capture found list is cleared and isCaptureTurn becomes true
+            foreach (uint piece in BitUtils.GetSetBits(soliders))
             {
                 int piecePosition = BitUtils.FindBitPosition(piece) % 8;
-                switch (piecePosition)
+                ShiftingFunctionsFactory.GetShiftingFuncs(piecePosition, i_Color, out moveLeft, out moveRight,
+                    out captureLeft, out captureRight);
+                // left capture check
+                if (captureLeft != null)
                 {
-                    //1 space from right
-                    case 0:
-                        // check capture condition
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftFive, shiftFour, movesList))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            // normal move checks
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFive, movesList);
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFour, movesList);
-                        }
-
-                        break;
-                    //pinned left
-                    case 3:
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftFour, shiftThree, movesList))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            normalMoveCheck(piece, blackPieces | whitePieces, shiftFour, movesList);
-                        }
-                        break;
-                    //pinned right
-                    case 4:
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftFour, shiftFive, movesList))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            normalMoveCheck(piece, blackPieces | whitePieces, shiftFour, movesList);
-                        }
-                        break;
-                    //1 space from left
-                    case 7:
-                        // check capture condition
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftThree, shiftFour, movesList))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            // normal move checks
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftThree, movesList);
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFour, movesList);
-                        }
-                        break;
-                    // center 
-                    case 1:
-                    case 2:
-                        // check capture condition for both sides
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftFour, shiftThree, movesList) ||
-                            captureCheck(piece, blackPieces, whitePieces, shiftFive, shiftFour, movesList))
-                        {
-                            break;
-                        }
-                        else // check normal move for both sides
-                        {
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFour, movesList);
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFive, movesList);
-                        }
-                        break;
-                    // center 
-                    case 5:
-                    case 6:
-                        // check capture condition for both sides
-                        if (captureCheck(piece, blackPieces, whitePieces, shiftThree, shiftFour, movesList) ||
-                            captureCheck(piece, blackPieces, whitePieces, shiftFour, shiftFive, movesList))
-                        {
-                            break;
-                        }
-                        else // check normal move for both sides
-                        {
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftThree, movesList);
-                            normalMoveCheck(piece, whitePieces | blackPieces, shiftFour, movesList);
-                        }
-                        break;
+                    captureCheck(piece, opposingPieces, friendlyPieces, moveLeft,
+                    captureLeft, movesList, ref isCaptureTurn);
+                }
+                // right capture check
+                if (captureRight != null)
+                {
+                    captureCheck(piece, opposingPieces, friendlyPieces, moveRight,
+                    captureRight, movesList, ref isCaptureTurn);
+                }
+                // normal move left
+                if (!isCaptureTurn && moveLeft != null)
+                {
+                    normalMoveCheck(piece, friendlyPieces | opposingPieces, moveLeft, movesList);
+                }
+                // normal move right
+                if (!isCaptureTurn && moveRight != null)
+                {
+                    normalMoveCheck(piece, friendlyPieces | opposingPieces, moveRight, movesList);
                 }
             }
 
             return movesList;
         }
 
-        private static List<Move> BlackMoves(uint[] i_BitBoards)
+        private static void queenMoveCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<Move> i_MoveList, bool i_IsCapture)
         {
-            return null;
+            
         }
 
         private static void normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc, List<Move> i_MoveList)
         {
-            if (!isPieceInTheWay(i_Piece, i_Board, i_ShiftingFunc))
+            bool outOfBounds = i_ShiftingFunc(i_Piece) == 0;
+            if (!outOfBounds && !isPieceInTheWay(i_Piece, i_Board, i_ShiftingFunc))
             {
-                i_MoveList.Add(new Move() { IsCapture = false, Origin = i_Piece, Destination = i_ShiftingFunc(i_Piece) });
+                i_MoveList.Add(new Move() {
+                    IsCapture = false,
+                    Origin = i_Piece, 
+                    Destination = i_ShiftingFunc(i_Piece)
+                });
             }
         }
 
-        private static bool captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<Move> i_MoveList)
+        private static void captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<Move> i_MoveList, ref bool io_IsCaptureTurn)
         {
-            bool isCapture = false;
-            if (isPieceInTheWay(i_Piece, i_OpposingPieces, i_ShiftingFunc) &&
-                               !isPieceInTheWay(i_ShiftingFunc(i_Piece), i_OpposingPieces | i_SamePieces, i_2ndShiftingFunc))
+            bool outOfBounds = i_ShiftingFunc(i_Piece) == 0 || i_2ndShiftingFunc(i_Piece) == 0;
+            if (!outOfBounds && isPieceInTheWay(i_Piece, i_OpposingPieces, i_ShiftingFunc) &&
+                !isPieceInTheWay(i_Piece, i_OpposingPieces | i_SamePieces, i_2ndShiftingFunc))
             {
-                i_MoveList.Add(new Move() { IsCapture = true, Origin = i_Piece, Destination = i_ShiftingFunc(i_ShiftingFunc(i_Piece)) });
-                isCapture = true;
-            }
+                if (!io_IsCaptureTurn)
+                {
+                    io_IsCaptureTurn = true;
+                    i_MoveList.Clear();
+                }
 
-            return isCapture;
+                i_MoveList.Add(new Move() { 
+                               IsCapture = true, 
+                               Origin = i_Piece, 
+                               Destination = i_2ndShiftingFunc(i_ShiftingFunc(i_Piece)), 
+                               Capture = i_ShiftingFunc(i_Piece)
+                });
+            }
         }
 
         private static bool isPieceInTheWay(uint piece, uint allColorPieces, Func<uint, uint> i_Shift)
@@ -206,6 +139,32 @@ namespace ConsoleCheckers
         internal static bool CheckValid(int i, int j)
         {
             return i >= 0 && i <= 7 && j >= 0 && j <= 7;
+        }
+
+        internal static bool CheckValidInt(int i_Square)
+        {
+            int i, j;
+            IntToCoordinate(i_Square, out i, out j);
+            return CheckValid(i, j);
+        }
+
+        private static void allocateBitBoards(eColor i_Color, uint[] i_BitBoards, out uint o_Friendly,
+            out uint o_Opposing, out uint o_Soliders, out uint o_Queens)
+        {
+            if (i_Color == eColor.White)
+            {
+                o_Friendly = i_BitBoards[0] | i_BitBoards[2];
+                o_Opposing = i_BitBoards[1] | i_BitBoards[3];
+                o_Soliders = i_BitBoards[0];
+                o_Queens = i_BitBoards[2];
+            }
+            else
+            {
+                o_Friendly = i_BitBoards[1] | i_BitBoards[3];
+                o_Opposing = i_BitBoards[0] | i_BitBoards[2];
+                o_Soliders = i_BitBoards[1];
+                o_Queens = i_BitBoards[3];
+            }
         }
     }
 }

@@ -45,11 +45,11 @@ namespace ConsoleCheckers
             PrintBoard();
         }
 
-        protected virtual void OnMadeMove(int iFrom, int jFrom, int iTo, int jTo)
+        protected virtual void OnMadeMove(Move i_Move)
         {
             m_SelectedSquares.Clear();
-            m_SelectedSquares.Add(PieceMethods.CoordinateToInt(iFrom, jFrom));
-            m_SelectedSquares.Add(PieceMethods.CoordinateToInt(iTo, jTo));
+            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.Origin));
+            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.Destination));
 
             PrintBoard();
         }
