@@ -64,6 +64,11 @@ namespace ConsoleCheckers
                     uint captureablePiece = 0;
                     foreach (uint piece in queenMovesIterator)
                     {
+                        if (piece == 0)
+                        {
+                            break;
+                        }
+
                         if (((friendlyPieces | opposingPieces) & piece) == 0) // empty square check
                         {
                             if (captureablePiece != 0)
@@ -112,11 +117,6 @@ namespace ConsoleCheckers
             }
 
             return movesList;
-        }
-
-        private static void queenMoveCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<Move> i_MoveList, bool i_IsCapture)
-        {
-            
         }
 
         private static void normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc, List<Move> i_MoveList)

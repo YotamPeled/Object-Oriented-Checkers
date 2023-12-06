@@ -124,18 +124,13 @@ namespace ConsoleCheckers
             {
                 updateBitBoard(i_PlayedMove, this[iFrom, jFrom]);
             }
+
+            this[iTo, jTo] = this[iFrom, jFrom];
+            this[iFrom, jFrom] = ePiece.None;
             // check if more captures are available, and if there are don't swap turn
             if (i_PlayedMove.IsCapture)
             {
-                GenerateLegalMoves();
-                foreach(Move move in m_LegalMoves)
-                {
-                    if (move.IsCapture && move.Origin == i_PlayedMove.Destination)
-                    {
-                        swapTurn = false;
-                        break;
-                    }
-                }
+                swapTurn &= !checkForAvailableCaptures(i_PlayedMove);
             }
 
             if (swapTurn)
@@ -143,9 +138,6 @@ namespace ConsoleCheckers
                 // changeTurn method also generates legal moves for next turn
                 changeTurn();
             }
-
-            this[iTo, jTo] = this[iFrom, jFrom];
-            this[iFrom, jFrom] = ePiece.None;
         }
 
         private void updateBitBoard(Move i_Move, ePiece i_PieceMakingMove, ePiece i_Captured = ePiece.None)
@@ -158,6 +150,21 @@ namespace ConsoleCheckers
             }
         }
 
+        private bool checkForAvailableCaptures(Move i_Move)
+        {
+            bool availableCapture = false;
+            GenerateLegalMoves();
+            foreach (Move move in m_LegalMoves)
+            {
+                if (move.IsCapture && move.Origin == i_Move.Destination)
+                {
+                    availableCapture = true;
+                    break;
+                }
+            }
+
+            return availableCapture;
+        }
         internal bool IsSquareInPlay(int i_Square)
         {
             bool isSquareInPlay = false;

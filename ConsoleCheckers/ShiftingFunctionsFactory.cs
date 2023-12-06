@@ -198,9 +198,10 @@ namespace ConsoleCheckers
 
         private static IEnumerable<uint> FirstLeftIterations(uint piece)
         {
-            while(piece != 0)
+            Func<uint, uint> shiftingFunc;
+            while (piece != 0)
             {
-                Func<uint, uint> shiftingFunc = wFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
+                shiftingFunc = wFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
@@ -215,9 +216,10 @@ namespace ConsoleCheckers
 
         private static IEnumerable<uint> SecondLeftIterations(uint piece)
         {
+            Func<uint, uint> shiftingFunc;
             while (piece != 0)
             {
-                Func<uint, uint> shiftingFunc = bFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
+                shiftingFunc = bFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
@@ -231,9 +233,10 @@ namespace ConsoleCheckers
         }
         private static IEnumerable<uint> FirstRightIterations(uint piece)
         {
+            Func<uint, uint> shiftingFunc;
             while (piece != 0)
             {
-                Func<uint, uint> shiftingFunc = wSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
+                shiftingFunc = wSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
@@ -247,9 +250,10 @@ namespace ConsoleCheckers
         }
         private static IEnumerable<uint> SecondRightIterations(uint piece)
         {
+            Func<uint, uint> shiftingFunc;
             while (piece != 0)
             {
-                Func<uint, uint> shiftingFunc = bSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
+                shiftingFunc = bSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
