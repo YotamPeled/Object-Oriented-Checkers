@@ -20,15 +20,14 @@ namespace ConsoleCheckers
             Func<uint, uint> moveRight;
             Func<uint, uint> captureLeft;
             Func<uint, uint> captureRight;
-            bool isCaptureTurn = false;
+            bool isCaptureTurn = false; // Force Captures, if capture found list is cleared and isCaptureTurn becomes true
             uint friendlyPieces;
             uint opposingPieces;
             uint soliders;
             uint queens;
 
             allocateBitBoards(i_Color, i_BitBoards, out friendlyPieces, out opposingPieces, out soliders, out queens);
-
-             // Force Captures, if capture found list is cleared and isCaptureTurn becomes true
+            // iterate through all soliders
             foreach (uint piece in BitUtils.GetSetBits(soliders))
             {
                 int piecePosition = BitUtils.FindBitPosition(piece) % 8;
@@ -94,7 +93,7 @@ namespace ConsoleCheckers
                 i_MoveList.Add(new Move() { 
                                IsCapture = true, 
                                Origin = i_Piece, 
-                               Destination = i_2ndShiftingFunc(i_ShiftingFunc(i_Piece)), 
+                               Destination = i_2ndShiftingFunc(i_Piece), 
                                Capture = i_ShiftingFunc(i_Piece)
                 });
             }

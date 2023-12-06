@@ -57,7 +57,7 @@ namespace ConsoleCheckers
             fillbFirstCapture();
             fillbSecondCapture();
         }
-        //up left
+        //move left
         private static void fillwFirstMove()
         {
             wFirstMoveDict = new Dictionary<int, Func<uint, uint>>();
@@ -70,7 +70,7 @@ namespace ConsoleCheckers
             wFirstMoveDict.Add(6, shiftLeftBy(4));
             wFirstMoveDict.Add(7, shiftLeftBy(4));
         }
-        //up right
+        //move right
         private static void fillwSecondMove()
         {
             wSecondMoveDict = new Dictionary<int, Func<uint, uint>>();
@@ -96,7 +96,7 @@ namespace ConsoleCheckers
             wFirstCaptureDict.Add(6, shiftLeftBy(9));
             wFirstCaptureDict.Add(7, null);
         }
-
+        // capture right
         private static void fillwSecondCapture()
         {
             wSecondCaptureDict = new Dictionary<int, Func<uint, uint>>();
@@ -109,57 +109,57 @@ namespace ConsoleCheckers
             wSecondCaptureDict.Add(6, shiftLeftBy(7));
             wSecondCaptureDict.Add(7, shiftLeftBy(7));
         }
-
+        // move left
         private static void fillbFirstMove()
         {
             bFirstMoveDict = new Dictionary<int, Func<uint, uint>>();
-            bFirstMoveDict.Add(0, shiftLeftBy(5));
-            bFirstMoveDict.Add(1, shiftLeftBy(5));
-            bFirstMoveDict.Add(2, shiftLeftBy(5));
+            bFirstMoveDict.Add(0, shiftRightBy(3));
+            bFirstMoveDict.Add(1, shiftRightBy(3));
+            bFirstMoveDict.Add(2, shiftRightBy(3));
             bFirstMoveDict.Add(3, null);
-            bFirstMoveDict.Add(4, shiftLeftBy(4));
-            bFirstMoveDict.Add(5, shiftLeftBy(4));
-            bFirstMoveDict.Add(6, shiftLeftBy(4));
-            bFirstMoveDict.Add(7, shiftLeftBy(4));
+            bFirstMoveDict.Add(4, shiftRightBy(4));
+            bFirstMoveDict.Add(5, shiftRightBy(4));
+            bFirstMoveDict.Add(6, shiftRightBy(4));
+            bFirstMoveDict.Add(7, shiftRightBy(4));
         }
-        //up right
+        //move right
         private static void fillbSecondMove()
         {
             bSecondMoveDict = new Dictionary<int, Func<uint, uint>>();
-            bSecondMoveDict.Add(0, shiftLeftBy(4));
-            bSecondMoveDict.Add(1, shiftLeftBy(4));
-            bSecondMoveDict.Add(2, shiftLeftBy(4));
-            bSecondMoveDict.Add(3, shiftLeftBy(4));
+            bSecondMoveDict.Add(0, shiftRightBy(4));
+            bSecondMoveDict.Add(1, shiftRightBy(4));
+            bSecondMoveDict.Add(2, shiftRightBy(4));
+            bSecondMoveDict.Add(3, shiftRightBy(4));
             bSecondMoveDict.Add(4, null);
-            bSecondMoveDict.Add(5, shiftLeftBy(3));
-            bSecondMoveDict.Add(6, shiftLeftBy(3));
-            bSecondMoveDict.Add(7, shiftLeftBy(3));
+            bSecondMoveDict.Add(5, shiftRightBy(5));
+            bSecondMoveDict.Add(6, shiftRightBy(5));
+            bSecondMoveDict.Add(7, shiftRightBy(5));
         }
         //capture left
         private static void fillbFirstCapture()
         {
             bFirstCaptureDict = new Dictionary<int, Func<uint, uint>>();
-            bFirstCaptureDict.Add(0, shiftLeftBy(9));
-            bFirstCaptureDict.Add(1, shiftLeftBy(9));
-            bFirstCaptureDict.Add(2, shiftLeftBy(9));
+            bFirstCaptureDict.Add(0, shiftRightBy(7));
+            bFirstCaptureDict.Add(1, shiftRightBy(7));
+            bFirstCaptureDict.Add(2, shiftRightBy(7));
             bFirstCaptureDict.Add(3, null);
-            bFirstCaptureDict.Add(4, shiftLeftBy(9));
-            bFirstCaptureDict.Add(5, shiftLeftBy(9));
-            bFirstCaptureDict.Add(6, shiftLeftBy(9));
+            bFirstCaptureDict.Add(4, shiftRightBy(7));
+            bFirstCaptureDict.Add(5, shiftRightBy(7));
+            bFirstCaptureDict.Add(6, shiftRightBy(7));
             bFirstCaptureDict.Add(7, null);
         }
-
+        // capture right
         private static void fillbSecondCapture()
         {
             bSecondCaptureDict = new Dictionary<int, Func<uint, uint>>();
             bSecondCaptureDict.Add(0, null);
-            bSecondCaptureDict.Add(1, shiftLeftBy(7));
-            bSecondCaptureDict.Add(2, shiftLeftBy(7));
-            bSecondCaptureDict.Add(3, shiftLeftBy(7));
+            bSecondCaptureDict.Add(1, shiftRightBy(9));
+            bSecondCaptureDict.Add(2, shiftRightBy(9));
+            bSecondCaptureDict.Add(3, shiftRightBy(9));
             bSecondCaptureDict.Add(4, null);
-            bSecondCaptureDict.Add(5, shiftLeftBy(7));
-            bSecondCaptureDict.Add(6, shiftLeftBy(7));
-            bSecondCaptureDict.Add(7, shiftLeftBy(7));
+            bSecondCaptureDict.Add(5, shiftRightBy(9));
+            bSecondCaptureDict.Add(6, shiftRightBy(9));
+            bSecondCaptureDict.Add(7, shiftRightBy(9));
         }
 
         private static Func<uint, uint> shiftLeftBy(int amount)
