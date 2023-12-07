@@ -14,6 +14,7 @@ namespace ConsoleCheckers
         {
             m_Board = i_Board;
             i_Board.MadeMove += OnMadeMove;
+            i_Board.GameEnded += OnGameEnd;
             PrintBoard();
         }
 
@@ -75,10 +76,13 @@ namespace ConsoleCheckers
                     }
                     
                     printPiece(m_Board[i, j]);
-                    printSpacing();
+                    printSpacing(); //changes console color back to black
                 }
+
                 Console.WriteLine();         
             }
+
+            Console.WriteLine($"White: {m_Board.whiteScore} | Black: {m_Board.blackScore}");
         }
 
         private void printPiece(ePiece i_Piece)
@@ -112,6 +116,11 @@ namespace ConsoleCheckers
         private void printRow()
         {
             Console.WriteLine("  0 1 2 3 4 5 6 7");
+        }
+
+        private void OnGameEnd(eColor i_WinningColor)
+        {
+            Console.WriteLine($"Game Ended, the winner is {i_WinningColor}");
         }
     }
 }

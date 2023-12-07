@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new FormsUI());
+            /*
             Board gameBoard = new Board();
             ConsoleUI UI = new ConsoleUI(gameBoard);
             string input = Console.ReadLine();
             bool isSquareSelected = false;
             int moveFrom = -1;
 
-            while(true)
+            while (true && gameBoard.GameOngoing)
             {
                 bool breakLoop = false;
                 int intInput;
@@ -68,6 +74,9 @@ namespace ConsoleCheckers
 
                 input = Console.ReadLine();
             }
+
+            Console.Read();
+            */
         }
     }
 }

@@ -9,6 +9,8 @@ namespace ConsoleCheckers
 {
     public class Board
     {
+        private bool m_Ongoing = true;
+        public bool GameOngoing { get { return m_Ongoing; } }
         private List<Move> m_LegalMoves = new List<Move>();
         public List<Move> LegalMoves
         {
@@ -34,6 +36,7 @@ namespace ConsoleCheckers
                 return m_ColorTurn;
             }
         }
+        public event Action<eColor> GameEnded;
         public event Action<Move> MadeMove;
         public ePiece this[int i, int j]
         {
@@ -60,11 +63,28 @@ namespace ConsoleCheckers
                 }
             }
         }
+
+        public int whiteScore 
+        { 
+            get 
+            {
+                return 12 - BitUtils.GetSetBitsAmount(m_BitBoards[(int)ePiece.sBlack - 1] | m_BitBoards[(int)ePiece.qBlack - 1]);
+            } 
+        }
+
+        public int blackScore 
+        { 
+            get
+            {
+                return 12 - BitUtils.GetSetBitsAmount(m_BitBoards[(int)ePiece.sWhite - 1] | m_BitBoards[(int)ePiece.qWhite - 1]);
+            }
+        }
+
         public Board()
         {
             m_BitBoards = new uint[4];
             m_Board = new ePiece[8,8];
-            PositionInitializer.randomQueen(this);
+            PositionInitializer.gameEndTest(this);
             GenerateLegalMoves();
         }
 
@@ -99,7 +119,6 @@ namespace ConsoleCheckers
                     {
                         isMoveLegal = true;
                         updateMove(i_From, i_To, move);
-                        MadeMove.Invoke(move);
                         break;
                     }
                 }
@@ -127,19 +146,47 @@ namespace ConsoleCheckers
 
             this[iTo, jTo] = this[iFrom, jFrom];
             this[iFrom, jFrom] = ePiece.None;
-            // check if more captures are available, and if there are don't swap turn
-            if (i_PlayedMove.IsCapture)
+            MadeMove.Invoke(i_PlayedMove);
+            if (gameContinueCheck())
             {
-                swapTurn &= !checkForAvailableCaptures(i_PlayedMove);
-            }
+                // check if more captures are available, and if there are don't swap turn
+                if (i_PlayedMove.IsCapture)
+                {
+                    swapTurn &= !checkForAvailableCaptures(i_PlayedMove);
+                }
 
-            if (swapTurn)
-            {
-                // changeTurn method also generates legal moves for next turn
-                changeTurn();
+                if (swapTurn)
+                {
+                    // changeTurn method also generates legal moves for next turn
+                    changeTurn();
+                }
             }
         }
 
+        private bool gameContinueCheck()
+        {
+            bool isWhiteAlive = (BitBoards[(int)ePiece.sWhite - 1] | BitBoards[(int)ePiece.qWhite - 1]) != 0;
+            bool isBlackAlive = (BitBoards[(int)ePiece.sBlack - 1] | BitBoards[(int)ePiece.qBlack - 1]) != 0;
+            bool isOngoingGame = isBlackAlive && isWhiteAlive;
+            if (!isOngoingGame)
+            {
+                OnGameEnd(isWhiteAlive);
+            }
+
+            return isOngoingGame;
+        }
+
+        private void OnGameEnd(bool i_WhiteStatus)
+        {
+            eColor winningColor = eColor.Black;
+            if (i_WhiteStatus)
+            {
+                winningColor = eColor.White;
+            }
+
+            m_Ongoing = false;
+            GameEnded?.Invoke(winningColor);
+        }
         private void updateBitBoard(Move i_Move, ePiece i_PieceMakingMove, ePiece i_Captured = ePiece.None)
         {
             // xor with the move made, meaning, remove origin location and add destination location to BitBoard
@@ -165,6 +212,7 @@ namespace ConsoleCheckers
 
             return availableCapture;
         }
+
         internal bool IsSquareInPlay(int i_Square)
         {
             bool isSquareInPlay = false;

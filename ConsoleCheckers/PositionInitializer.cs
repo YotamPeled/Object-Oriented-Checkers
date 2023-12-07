@@ -52,6 +52,27 @@ namespace ConsoleCheckers
             }
         }
 
+        public static void gameEndTest(Board i_Board)
+        {
+            int n = 2;
+            List<Tuple<int, int>> pairs = generatePairs(n);
+            int counter = 0;
+            foreach (var pair in pairs)
+            {
+                counter++;
+                if (counter == 1)
+                {
+                    i_Board[pair.Item1, pair.Item2] = ePiece.qBlack;
+                    i_Board.BitBoards[(int)ePiece.qBlack - 1] |= 1U << 31;
+                }
+                else
+                {
+                    i_Board[pair.Item1, pair.Item2] = ePiece.qWhite;
+                    i_Board.BitBoards[(int)ePiece.qWhite - 1] |= 1U << 30;
+                }
+            }
+        }
+
         static List<Tuple<int, int>> generatePairs(int n)
         {
             List<Tuple<int, int>> result = new List<Tuple<int, int>>();

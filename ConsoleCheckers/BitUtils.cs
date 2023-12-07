@@ -34,6 +34,21 @@ namespace ConsoleCheckers
             return bitList;
         }
 
+        public static int GetSetBitsAmount(uint number)
+        {
+            int setBitsAmount = 0;
+
+            for (int i = 0; i < 32; i++)
+            {
+                if ((number & (1 << i)) != 0)
+                {
+                    setBitsAmount++;
+                }
+            }
+
+            return setBitsAmount;
+        }
+
         public static string ToBitString(uint value)
         {
             return Convert.ToString(value, 2).PadLeft(32, '0');

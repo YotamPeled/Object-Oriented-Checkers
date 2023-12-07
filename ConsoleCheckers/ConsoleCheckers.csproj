@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F44688FD-92E9-4B77-BE88-2BAA4332B7CB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>ConsoleCheckers</RootNamespace>
     <AssemblyName>ConsoleCheckers</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -32,21 +32,38 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YotamControls">
+      <HintPath>C:\Users\Yotam\Desktop\YotamControls.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitUtils.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="CheckersButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ConsoleUI.cs" />
     <Compile Include="eColor.cs" />
+    <Compile Include="FormsUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormsUIDesign.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Move.cs" />
     <Compile Include="PieceMethods.cs" />
     <Compile Include="ePiece.cs" />
@@ -54,9 +71,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftingFunctionsFactory.cs" />
+    <Compile Include="UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FormsUIDesign.resx">
+      <DependentUpon>FormsUIDesign.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
