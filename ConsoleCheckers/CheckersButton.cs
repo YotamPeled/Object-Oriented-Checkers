@@ -10,19 +10,18 @@ namespace ConsoleCheckers
 {
     internal class CheckersButton : YotamButton
     {
-        private int m_Position;
-        public int Position { get { return m_Position; } }
-        public CheckersButton(int i_Position)
+        private uint m_bitPosition;
+        public uint bitPosition { get { return m_bitPosition; } }
+        public CheckersButton(uint i_bitPosition)
         {
-            m_Position = i_Position;
-            this.Text = m_Position.ToString();
+            m_bitPosition = i_bitPosition;
             selectBackColor();
         }
 
         private void selectBackColor()
         {
             int colorIndex;
-            if (UIUtils.isBackColorWhite(m_Position))
+            if (UIUtils.isBackColorWhite(m_bitPosition))
             {
                 colorIndex = 27;
             }

@@ -49,6 +49,11 @@ namespace ConsoleCheckers
             return setBitsAmount;
         }
 
+        public static uint BitPositionToUInt(int i_BitPosition)
+        {
+            return (uint)(0b01 << i_BitPosition);
+        }
+
         public static string ToBitString(uint value)
         {
             return Convert.ToString(value, 2).PadLeft(32, '0');

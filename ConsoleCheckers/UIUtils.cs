@@ -8,16 +8,14 @@ namespace ConsoleCheckers
 {
     public static class UIUtils
     {
-        public static bool isBackColorWhite(int i_Position)
+        public static bool isBackColorWhite(uint i_Position)
         {
-            int i, j;
             bool isWhite;
-            PieceMethods.IntToCoordinate(i_Position, out i, out j);
-            if ((i + j) % 2 == 0)
+            if (i_Position == 0) // unreachable square
             {
                 isWhite = true;
             }
-            else
+            else //reachable
             {
                 isWhite = false;
             }
