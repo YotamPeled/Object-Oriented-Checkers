@@ -146,7 +146,7 @@ namespace ConsoleCheckers
 
             this[iTo, jTo] = this[iFrom, jFrom];
             this[iFrom, jFrom] = ePiece.None;
-            MadeMove.Invoke(i_PlayedMove);
+            MadeMove?.Invoke(i_PlayedMove);
             if (gameContinueCheck())
             {
                 // check if more captures are available, and if there are don't swap turn

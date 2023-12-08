@@ -172,6 +172,11 @@ namespace ConsoleCheckers
         public static int UIntToInt(uint i_Piece)
         {
             int locationNumbering = BitUtils.FindBitPosition(i_Piece);
+            if (locationNumbering == -1) // no bit found
+            {
+                return 0;
+            }
+
             int offset;
             switch (locationNumbering / 4)
             {

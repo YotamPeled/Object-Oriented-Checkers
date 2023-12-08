@@ -24,3 +24,4 @@ D:\Console Checkers\completeCheckers\ConsoleCheckers\bin\Debug\YotamControls.dll
 D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.FormsUI.resources
 D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.GenerateResource.cache
 D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.csproj.CopyComplete
+D:\Console Checkers\completeCheckers\ConsoleCheckers\obj\Debug\ConsoleCheckers.Images.resources

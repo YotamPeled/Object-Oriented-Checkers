@@ -12,6 +12,7 @@ namespace ConsoleCheckers
         [STAThread]
         static void Main(string[] args)
         {
+            GameMasterSingleton.Instance.Board = new Board();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormsUI());

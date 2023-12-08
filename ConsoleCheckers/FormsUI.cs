@@ -9,58 +9,117 @@ namespace ConsoleCheckers
     public partial class FormsUI
     {
         private uint m_SelectedSquare;
+        private List<CheckersButton> m_MarkedButtons = new List<CheckersButton>();
         private Board m_GameBoard;
         private Dictionary<uint, CheckersButton> m_PositionToButtonDict = new Dictionary<uint, CheckersButton>();
         public FormsUI()
         {
-            m_GameBoard = new Board();
+            m_GameBoard = GameMasterSingleton.Instance.Board;
+            m_GameBoard.MadeMove += OnMadeMove;
             InitializeComponent();
             fillDict();
-            loadPieceImages();
+            loadPieceImagesAndAddActions();
         }
 
         private void fillDict()
         {
             foreach(CheckersButton buttonSquare in panelCheckers.Controls)
             {
-                m_PositionToButtonDict[buttonSquare.bitPosition] = buttonSquare;
+                if (buttonSquare.BitPosition != 0)
+                {
+                    m_PositionToButtonDict[buttonSquare.BitPosition] = buttonSquare;
+                }
             }
         }
 
-        private void loadPieceImages()
+        private void loadPieceImagesAndAddActions()
         {
-            List<uint> whiteSoliders = BitUtils.GetSetBits(m_GameBoard.BitBoards[(int)ePiece.sWhite - 1]);
-            List<uint> whiteQueens = BitUtils.GetSetBits(m_GameBoard.BitBoards[(int)ePiece.qWhite - 1]);
-            List<uint> blackSoliders = BitUtils.GetSetBits(m_GameBoard.BitBoards[(int)ePiece.sBlack - 1]);
-            List<uint> blackQueens = BitUtils.GetSetBits(m_GameBoard.BitBoards[(int)ePiece.qBlack - 1]);
-
-            foreach(uint whitePiece in whiteSoliders)
+            foreach(CheckersButton button in panelCheckers.Controls)
             {
-                m_PositionToButtonDict[whitePiece].Text = "w";
-            }
-
-            foreach (uint whiteQueen in whiteQueens)
-            {
-                m_PositionToButtonDict[whiteQueen].Text = "W";
-
-            }
-
-            foreach (uint blackPiece in blackSoliders)
-            {
-                m_PositionToButtonDict[blackPiece].Text = "b";
-
-            }
-
-            foreach (uint blackQueen in blackQueens)
-            {
-                m_PositionToButtonDict[blackQueen].Text = "B";
-
+                button.Draw();
+                button.Click += Button_Click;
             }
         }
 
-        private void Select(uint i_Selection)
+        private void Button_Click(object sender, EventArgs e)
         {
+            CheckersButton clickedSquare = sender as CheckersButton;
+            // white square clicked
+            if (clickedSquare.BitPosition == 0 || m_SelectedSquare == 0)
+            {
+                select(clickedSquare.BitPosition);
+            }
+            else
+            {
+                bool isLegalMove = false;
+                foreach(Move move in m_GameBoard.LegalMoves)
+                {
+                    if (move.Origin == m_SelectedSquare && move.Destination == clickedSquare.BitPosition)
+                    {
+                        isLegalMove = true;
+                        m_GameBoard.MakeMove(
+                            PieceMethods.UIntToInt(m_SelectedSquare), PieceMethods.UIntToInt(clickedSquare.BitPosition)
+                            );
+                        break;
+                    }
+                }
+
+                if (!isLegalMove)
+                {
+                    select(clickedSquare.BitPosition);
+                }
+            }
+        }
+
+        private void select(uint i_Selection)
+        {
+            clearMarkedSquares();
             m_SelectedSquare = i_Selection;
+            // valid black square
+            if (i_Selection != 0)
+            {
+                markSquare(i_Selection);
+                foreach (Move move in m_GameBoard.LegalMoves)
+                {
+                    if (move.Origin == i_Selection)
+                    {
+                        markSquare(move.Destination);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        private void markSquare(uint i_SquareToMark)
+        {
+            CheckersButton buttonToMark = m_PositionToButtonDict[i_SquareToMark];
+            buttonToMark.Select();
+            m_MarkedButtons.Add(buttonToMark);
+        }
+
+        private void clearMarkedSquares()
+        {
+            m_SelectedSquare = 0;
+            foreach(CheckersButton button in m_MarkedButtons)
+            {
+                ImageUtils.ClearCircleFromButton(button);
+            }
+
+            m_MarkedButtons.Clear();
+        }
+
+        private void OnMadeMove(Move i_Move)
+        {
+            clearMarkedSquares();
+            m_PositionToButtonDict[i_Move.Origin].Draw();
+            m_PositionToButtonDict[i_Move.Destination].Draw();
+            if (i_Move.IsCapture)
+            {
+                m_PositionToButtonDict[i_Move.Capture].Draw();
+            }
         }
     }
 }

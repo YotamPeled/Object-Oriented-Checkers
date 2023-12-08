@@ -804,6 +804,7 @@ namespace ConsoleCheckers
             this.Controls.Add(this.mainPanel);
             this.Name = "FormsUI";
             this.panelCheckers.ResumeLayout(false);
+            this.panelCheckers.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             panel3.Visible = false;
             this.ResumeLayout(false);
