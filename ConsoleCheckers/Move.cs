@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace ConsoleCheckers
 {
-    public struct Move
+    public interface IMove
     {
-        public bool IsCapture { get; set; }
-        public uint Capture { get; set; }
-        public uint Origin { get; set; }
-        public uint Destination { get; set; }
+        int GetIntStartSquare();
+        int GetIntTargetSquare();
+        int GetIntCaptureSquare();
+        uint GetTargetSquare();
+        uint GetStartSquare();
+        uint GetCaptureSquare();
+        bool IsCapture();
+        bool IsPromotion();
     }
 }

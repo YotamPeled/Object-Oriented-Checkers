@@ -9,8 +9,10 @@ namespace ConsoleCheckers
     public sealed class GameMasterSingleton
     {
         public Board Board { get; set; }
+        public int QueenMoveLimit { get; set; }
         private GameMasterSingleton()
         {
+            QueenMoveLimit = 1;
         }
 
         private static GameMasterSingleton s_Instance = null;

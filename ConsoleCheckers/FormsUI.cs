@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
@@ -16,6 +17,7 @@ namespace ConsoleCheckers
         {
             m_GameBoard = GameMasterSingleton.Instance.Board;
             m_GameBoard.MadeMove += OnMadeMove;
+            m_GameBoard.GameEnded += OnGameEnd;
             InitializeComponent();
             fillDict();
             loadPieceImagesAndAddActions();
@@ -52,9 +54,9 @@ namespace ConsoleCheckers
             else
             {
                 bool isLegalMove = false;
-                foreach(Move move in m_GameBoard.LegalMoves)
+                foreach(IMove move in m_GameBoard.LegalMoves)
                 {
-                    if (move.Origin == m_SelectedSquare && move.Destination == clickedSquare.BitPosition)
+                    if (move.GetStartSquare() == m_SelectedSquare && move.GetTargetSquare() == clickedSquare.BitPosition)
                     {
                         isLegalMove = true;
                         m_GameBoard.MakeMove(
@@ -79,11 +81,11 @@ namespace ConsoleCheckers
             if (i_Selection != 0)
             {
                 markSquare(i_Selection);
-                foreach (Move move in m_GameBoard.LegalMoves)
+                foreach (IMove move in m_GameBoard.LegalMoves)
                 {
-                    if (move.Origin == i_Selection)
+                    if (move.GetStartSquare() == i_Selection)
                     {
-                        markSquare(move.Destination);
+                        markSquare(move.GetTargetSquare());
                     }
                     else
                     {
@@ -111,15 +113,42 @@ namespace ConsoleCheckers
             m_MarkedButtons.Clear();
         }
 
-        private void OnMadeMove(Move i_Move)
+        private void OnMadeMove(IMove i_Move)
         {
             clearMarkedSquares();
-            m_PositionToButtonDict[i_Move.Origin].Draw();
-            m_PositionToButtonDict[i_Move.Destination].Draw();
-            if (i_Move.IsCapture)
+            m_PositionToButtonDict[i_Move.GetStartSquare()].Draw();
+            m_PositionToButtonDict[i_Move.GetTargetSquare()].Draw();
+            if (i_Move.IsCapture())
             {
-                m_PositionToButtonDict[i_Move.Capture].Draw();
+                m_PositionToButtonDict[i_Move.GetCaptureSquare()].Draw();
+                updateTakenPiecesPanel();
             }
+        }
+
+        private void updateTakenPiecesPanel()
+        {
+            if (m_GameBoard.Turn == eColor.White)
+            {
+                panelWhiteCapture.AddImage();
+            }
+            else if(m_GameBoard.Turn == eColor.Black)
+            {
+                panelBlackCapture.AddImage();
+            }
+        }
+
+        private void OnGameEnd(eColor i_Color)
+        {
+            MessageBox.Show($"game has ended, the winner is {i_Color}");
+        }
+
+        private void TrackBarQueenMoveLimit_ValueChanged(object sender, EventArgs e)
+        {
+            int limitValue = ((TrackBar)sender).Value;
+            LabelQueenMoveLimit.Text = limitValue.ToString();
+            GameMasterSingleton.Instance.QueenMoveLimit = limitValue;
+            m_GameBoard.GenerateLegalMoves();
+            this.select(m_SelectedSquare);
         }
     }
 }

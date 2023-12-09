@@ -6,17 +6,17 @@ namespace ConsoleCheckers
 {
     public static class PieceMethods
     {
-        public static List<Move> GiveLegalMoves(uint[] i_BitBoards, eColor i_ColorToMove)
+        public static List<IMove> GiveLegalMoves(uint[] i_BitBoards, eColor i_ColorToMove)
         {
-            List<Move> moveList;          
-            moveList = Moves(i_BitBoards, i_ColorToMove);
+            List<IMove> moveList;          
+            moveList = generateMoves(i_BitBoards, i_ColorToMove);
             
             return moveList;
         }
 
-        private static List<Move> Moves(uint[] i_BitBoards, eColor i_Color)
+        private static List<IMove> generateMoves(uint[] i_BitBoards, eColor i_Color)
         {
-            List<Move> movesList = new List<Move>();
+            List<IMove> movesList = new List<IMove>();
             Func<uint, uint> moveLeft;
             Func<uint, uint> moveRight;
             Func<uint, uint> captureLeft;
@@ -59,7 +59,7 @@ namespace ConsoleCheckers
 
             foreach (uint queen in BitUtils.GetSetBits(queens))
             {
-                foreach (IEnumerable<uint> queenMovesIterator in ShiftingFunctionsFactory.GetQueenIterators(queen))
+                foreach (IEnumerable<uint> queenMovesIterator in ShiftingFunctionsFactory.GetQueenIterators(queen, opposingPieces))
                 {
                     uint captureablePiece = 0;
                     foreach (uint piece in queenMovesIterator)
@@ -79,24 +79,12 @@ namespace ConsoleCheckers
                                     isCaptureTurn = true;
                                 }
 
-                                movesList.Add(new Move()
-                                {
-                                    IsCapture = true,
-                                    Origin = queen,
-                                    Capture = captureablePiece,
-                                    Destination = piece
-                                });
-
+                                movesList.Add(new MoveAdapter(new CheckersMove(queen, piece, captureablePiece)));
                                 break;
                             }
                             else if (!isCaptureTurn)
                             {
-                                movesList.Add(new Move()
-                                {
-                                    IsCapture = false,
-                                    Origin = queen,
-                                    Destination = piece
-                                });
+                                movesList.Add(new MoveAdapter(new CheckersMove(queen, piece)));
                             }
                         }
                         else if ((opposingPieces & piece) != 0) //enemy piece seen
@@ -119,20 +107,16 @@ namespace ConsoleCheckers
             return movesList;
         }
 
-        private static void normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc, List<Move> i_MoveList)
+        private static void normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc, List<IMove> i_MoveList)
         {
             bool outOfBounds = i_ShiftingFunc(i_Piece) == 0;
             if (!outOfBounds && !isPieceInTheWay(i_Piece, i_Board, i_ShiftingFunc))
             {
-                i_MoveList.Add(new Move() {
-                    IsCapture = false,
-                    Origin = i_Piece, 
-                    Destination = i_ShiftingFunc(i_Piece)
-                });
+                i_MoveList.Add(new MoveAdapter(new CheckersMove(i_Piece, i_ShiftingFunc(i_Piece))));
             }
         }
 
-        private static void captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<Move> i_MoveList, ref bool io_IsCaptureTurn)
+        private static void captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<IMove> i_MoveList, ref bool io_IsCaptureTurn)
         {
             bool outOfBounds = i_ShiftingFunc(i_Piece) == 0 || i_2ndShiftingFunc(i_Piece) == 0;
             if (!outOfBounds && isPieceInTheWay(i_Piece, i_OpposingPieces, i_ShiftingFunc) &&
@@ -144,12 +128,7 @@ namespace ConsoleCheckers
                     i_MoveList.Clear();
                 }
 
-                i_MoveList.Add(new Move() { 
-                               IsCapture = true, 
-                               Origin = i_Piece, 
-                               Destination = i_2ndShiftingFunc(i_Piece), 
-                               Capture = i_ShiftingFunc(i_Piece)
-                });
+                i_MoveList.Add(new MoveAdapter(new CheckersMove(i_Piece, i_2ndShiftingFunc(i_Piece), i_ShiftingFunc(i_Piece))));
             }
         }
 

@@ -188,23 +188,26 @@ namespace ConsoleCheckers
             return (number) => { return number >> amount; };
         }
 
-        public static IEnumerable<IEnumerable<uint>> GetQueenIterators(uint i_Piece)
+        public static IEnumerable<IEnumerable<uint>> GetQueenIterators(uint i_Piece, uint i_OpposingPieces)
         {
-            yield return FirstLeftIterations(i_Piece);
-            yield return SecondLeftIterations(i_Piece);
-            yield return FirstRightIterations(i_Piece);
-            yield return SecondRightIterations(i_Piece);
+            yield return FirstLeftIterations(i_Piece, i_OpposingPieces);
+            yield return SecondLeftIterations(i_Piece, i_OpposingPieces);
+            yield return FirstRightIterations(i_Piece, i_OpposingPieces);
+            yield return SecondRightIterations(i_Piece, i_OpposingPieces);
         }
 
-        private static IEnumerable<uint> FirstLeftIterations(uint piece)
+        private static IEnumerable<uint> FirstLeftIterations(uint piece, uint i_OpposingPieces)
         {
+            int moveLimit = GameMasterSingleton.Instance.QueenMoveLimit;
             Func<uint, uint> shiftingFunc;
-            while (piece != 0)
-            {
+            while (moveLimit > 0)
+            {  
                 shiftingFunc = wFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
+                    // check if reached a captureable piece, if so allow for an extra iteration
+                    moveLimit -= (i_OpposingPieces & piece) == 0 ? 1 : 0;
                     yield return piece;
                 }
                 else
@@ -214,15 +217,18 @@ namespace ConsoleCheckers
             }
         }
 
-        private static IEnumerable<uint> SecondLeftIterations(uint piece)
+        private static IEnumerable<uint> SecondLeftIterations(uint piece, uint i_OpposingPieces)
         {
+            int moveLimit = GameMasterSingleton.Instance.QueenMoveLimit;
             Func<uint, uint> shiftingFunc;
-            while (piece != 0)
+            while (moveLimit > 0)
             {
                 shiftingFunc = bFirstMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
+                    // check if reached a captureable piece, if so allow for an extra iteration
+                    moveLimit -= (i_OpposingPieces & piece) == 0 ? 1 : 0;
                     yield return piece;
                 }
                 else
@@ -231,15 +237,18 @@ namespace ConsoleCheckers
                 }
             }
         }
-        private static IEnumerable<uint> FirstRightIterations(uint piece)
+        private static IEnumerable<uint> FirstRightIterations(uint piece, uint i_OpposingPieces)
         {
+            int moveLimit = GameMasterSingleton.Instance.QueenMoveLimit;
             Func<uint, uint> shiftingFunc;
-            while (piece != 0)
+            while (moveLimit > 0)
             {
                 shiftingFunc = wSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
+                    // check if reached a captureable piece, if so allow for an extra iteration
+                    moveLimit -= (i_OpposingPieces & piece) == 0 ? 1 : 0;
                     yield return piece;
                 }
                 else
@@ -248,15 +257,19 @@ namespace ConsoleCheckers
                 }
             }
         }
-        private static IEnumerable<uint> SecondRightIterations(uint piece)
+        private static IEnumerable<uint> SecondRightIterations(uint piece, uint i_OpposingPieces)
         {
+            int moveLimit = GameMasterSingleton.Instance.QueenMoveLimit;
+
             Func<uint, uint> shiftingFunc;
-            while (piece != 0)
+            while (moveLimit > 0)
             {
                 shiftingFunc = bSecondMoveDict[BitUtils.FindBitPosition(piece) % 8];
                 if (shiftingFunc != null)
                 {
                     piece = shiftingFunc(piece);
+                    // check if reached a captureable piece, if so allow for an extra iteration
+                    moveLimit -= (i_OpposingPieces & piece) == 0 ? 1 : 0;
                     yield return piece;
                 }
                 else

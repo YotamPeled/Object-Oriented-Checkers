@@ -22,11 +22,11 @@ namespace ConsoleCheckers
         {
             bool legalSelection = false;
 
-            foreach(Move legalMove in m_Board.LegalMoves)
+            foreach(IMove legalMove in m_Board.LegalMoves)
             {
-                if (PieceMethods.UIntToInt(legalMove.Origin) == i_SquareToSelect)
+                if (PieceMethods.UIntToInt(legalMove.GetStartSquare()) == i_SquareToSelect)
                 {
-                    m_SelectedSquares.Add(PieceMethods.UIntToInt(legalMove.Destination));
+                    m_SelectedSquares.Add(PieceMethods.UIntToInt(legalMove.GetTargetSquare()));
                     legalSelection = true;
                 }
             }
@@ -46,11 +46,11 @@ namespace ConsoleCheckers
             PrintBoard();
         }
 
-        protected virtual void OnMadeMove(Move i_Move)
+        protected virtual void OnMadeMove(IMove i_Move)
         {
             m_SelectedSquares.Clear();
-            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.Origin));
-            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.Destination));
+            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.GetStartSquare()));
+            m_SelectedSquares.Add(PieceMethods.UIntToInt(i_Move.GetTargetSquare()));
 
             PrintBoard();
         }

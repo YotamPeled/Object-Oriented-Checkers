@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,12 @@ namespace ConsoleCheckers
 {
     public partial class FormsUI : Form
     {
+        private TrackBar TrackBarQueenMoveLimit;
+        private Label LabelQueenMoveLimit;
+        private Label LabelQueenLimitText;
         private YotamPanel panelCheckers;
+        private YotamImagePanel panelWhiteCapture;
+        private YotamImagePanel panelBlackCapture;
         private YotamPanel mainPanel;
         private CheckersButton CheckersButton8;
         private CheckersButton CheckersButton7;
@@ -78,9 +84,11 @@ namespace ConsoleCheckers
         private CheckersButton CheckersButton15;
         private CheckersButton CheckersButton16;
         private YotamButton ResignButton;
-        private YotamButton CheckersButton66;
-        private YotamButton CheckersButton65;
+        private YotamButton ButtonGameSettings;
+        private YotamButton ButtonComputerSettings;
         private YotamPanel panel3;
+        private YotamPanel panelGameSettings;
+        private YotamButton ButtonClosePanel;
 
         private void InitializeComponent()
         {
@@ -153,9 +161,10 @@ namespace ConsoleCheckers
             this.CheckersButton62 = new CheckersButton(0);
             this.CheckersButton63 = new CheckersButton(BitUtils.BitPositionToUInt(25));
             this.CheckersButton64 = new CheckersButton(0);
-            this.CheckersButton65 = new YotamControls.YotamButton();
-            this.CheckersButton66 = new YotamControls.YotamButton();
+            this.ButtonGameSettings = new YotamControls.YotamButton();
+            this.ButtonComputerSettings = new YotamControls.YotamButton();
             this.ResignButton = new YotamControls.YotamButton();
+            this.panelGameSettings = new YotamPanel();
             this.panelCheckers.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -302,8 +311,8 @@ namespace ConsoleCheckers
             // panel2
             // 
             this.panel2.Controls.Add(this.ResignButton);
-            this.panel2.Controls.Add(this.CheckersButton66);
-            this.panel2.Controls.Add(this.CheckersButton65);
+            this.panel2.Controls.Add(this.ButtonGameSettings);
+            this.panel2.Controls.Add(this.ButtonComputerSettings);
             this.panel2.Location = new System.Drawing.Point(792, 50);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(137, 615);
@@ -767,21 +776,24 @@ namespace ConsoleCheckers
             // 
             // CheckersButton65
             // 
-            this.CheckersButton65.Location = new System.Drawing.Point(3, 3);
-            this.CheckersButton65.Name = "CheckersButton65";
-            this.CheckersButton65.Size = new System.Drawing.Size(131, 71);
-            this.CheckersButton65.TabIndex = 0;
-            this.CheckersButton65.UseVisualStyleBackColor = true;
-            CheckersButton65.SelectThemeColor(32);
+            this.ButtonGameSettings.Location = new System.Drawing.Point(3, 3);
+            this.ButtonGameSettings.Name = "ButtonGameSettings";
+            this.ButtonGameSettings.Size = new System.Drawing.Size(131, 71);
+            this.ButtonGameSettings.TabIndex = 0;
+            this.ButtonGameSettings.UseVisualStyleBackColor = true;
+            this.ButtonGameSettings.Text = "Game Settings";
+            ButtonGameSettings.SelectThemeColor(32);
+            ButtonGameSettings.Click += ButtonGameSettings_Click;
             // 
             // CheckersButton66
             // 
-            this.CheckersButton66.Location = new System.Drawing.Point(3, 80);
-            this.CheckersButton66.Name = "CheckersButton66";
-            this.CheckersButton66.Size = new System.Drawing.Size(131, 71);
-            this.CheckersButton66.TabIndex = 1;
-            this.CheckersButton66.UseVisualStyleBackColor = true;
-            CheckersButton66.SelectThemeColor(32);
+            this.ButtonComputerSettings.Location = new System.Drawing.Point(3, 80);
+            this.ButtonComputerSettings.Name = "ButtonComputerSettings";
+            this.ButtonComputerSettings.Size = new System.Drawing.Size(131, 71);
+            this.ButtonComputerSettings.TabIndex = 1;
+            this.ButtonComputerSettings.UseVisualStyleBackColor = true;
+            this.ButtonComputerSettings.Text = "Computer Settings";
+            ButtonComputerSettings.SelectThemeColor(32);
             // 
             // CheckersButton67
             // 
@@ -792,6 +804,80 @@ namespace ConsoleCheckers
             this.ResignButton.UseVisualStyleBackColor = true;
             ResignButton.Text = "Resign";
             ResignButton.SelectThemeColor(8);
+            //
+            //Button Close Panel
+            //
+            ButtonClosePanel = new YotamButton();
+            this.ButtonClosePanel.SelectThemeColor(8);
+            ButtonClosePanel.Name = "ButtonClosePanel";
+            ButtonClosePanel.Size = this.ResignButton.Size = new System.Drawing.Size(131, 71);
+            ButtonClosePanel.Location = new Point(3, 541);
+            ButtonClosePanel.Text = "Close";
+            ButtonClosePanel.Click += ButtonClosePanel_Click;
+            //
+            //panelsCapture
+            //
+            panelWhiteCapture = new YotamImagePanel();
+            panelBlackCapture = new YotamImagePanel();
+            panelWhiteCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Top - 35);
+            panelBlackCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Bottom + 5);
+            panelWhiteCapture.Size = new Size(panelCheckers.Width, 30);
+            panelBlackCapture.Size = new Size(panelCheckers.Width, 30);
+            panelBlackCapture.ChangeColor(31);
+            panelWhiteCapture.ChangeColor(31);
+            panelWhiteCapture.BorderStyle = BorderStyle.FixedSingle;
+            panelBlackCapture.BorderStyle = BorderStyle.FixedSingle;
+            panelBlackCapture.Image = Images.white_pawn_icon;
+            panelWhiteCapture.Image = Images.black_pawn_icon;
+            //
+            //panel game settings and it's components
+            //
+            panelGameSettings.Size = panel2.Size;
+            panelGameSettings.ChangeColor(32);
+            panelGameSettings.Controls.Add(ButtonClosePanel);
+            LabelQueenMoveLimit = new Label();
+            LabelQueenLimitText = new Label();
+            TrackBarQueenMoveLimit = new TrackBar();
+            panelGameSettings.Controls.Add(LabelQueenLimitText);
+            panelGameSettings.Controls.Add(LabelQueenMoveLimit);
+            panelGameSettings.Controls.Add(TrackBarQueenMoveLimit);
+            // 
+            // LabelQueenMoveLimit
+            // 
+            LabelQueenMoveLimit.AutoSize = true;
+            LabelQueenMoveLimit.Name = "LabelQueenMoveLimit";
+            LabelQueenMoveLimit.TabIndex = 2;
+            LabelQueenMoveLimit.Text = "1";
+            LabelQueenMoveLimit.ForeColor = Color.White;
+            LabelQueenMoveLimit.AutoSize = false;
+            LabelQueenMoveLimit.TextAlign = ContentAlignment.MiddleCenter;
+            LabelQueenMoveLimit.Size = new Size(panelGameSettings.Size.Width - 20, 30); // Adjusted size based on panelGameSettings
+            LabelQueenMoveLimit.Location = new Point((panelGameSettings.Width - LabelQueenMoveLimit.Width) / 2, 20);
+            // 
+            // label1
+            // 
+            LabelQueenLimitText.AutoSize = true;
+            LabelQueenLimitText.Name = "label1";
+            LabelQueenLimitText.TabIndex = 1;
+            LabelQueenLimitText.Text = "Queen Move Limit:";
+            LabelQueenLimitText.ForeColor = Color.White;
+            LabelQueenLimitText.AutoSize = true;
+            LabelQueenLimitText.TextAlign = ContentAlignment.MiddleCenter;
+            LabelQueenLimitText.Size = new Size(panelGameSettings.Size.Width - 20, 30); // Adjusted size based on panelGameSettings
+            LabelQueenLimitText.Location = new Point((panelGameSettings.Width - LabelQueenLimitText.Width) / 2, 5);
+            // 
+            // trackBarQueenMoveLimit
+            // 
+            TrackBarQueenMoveLimit.LargeChange = 1;
+            TrackBarQueenMoveLimit.Maximum = 7;
+            TrackBarQueenMoveLimit.Minimum = 1;
+            TrackBarQueenMoveLimit.Name = "trackBarQueenMoveLimit";
+            TrackBarQueenMoveLimit.TabIndex = 0;
+            TrackBarQueenMoveLimit.TabStop = false;
+            TrackBarQueenMoveLimit.Value = 1;
+            TrackBarQueenMoveLimit.ValueChanged += TrackBarQueenMoveLimit_ValueChanged;
+            TrackBarQueenMoveLimit.Size = new Size(panelGameSettings.Size.Width - 20, 45); // Adjusted size based on panelGameSettings
+            TrackBarQueenMoveLimit.Location = new Point((panelGameSettings.Width - TrackBarQueenMoveLimit.Width) / 2, 50);
             // 
             // FormsUI
             // 
@@ -801,6 +887,9 @@ namespace ConsoleCheckers
             this.mainPanel.Controls.Add(panel3);
             this.mainPanel.Controls.Add(panel2);
             this.mainPanel.Controls.Add(panelCheckers);
+            this.mainPanel.Controls.Add(panelWhiteCapture);
+            this.mainPanel.Controls.Add(panelBlackCapture);
+            panelWhiteCapture.RefreshPanel();
             this.Controls.Add(this.mainPanel);
             this.Name = "FormsUI";
             this.panelCheckers.ResumeLayout(false);
@@ -809,6 +898,17 @@ namespace ConsoleCheckers
             panel3.Visible = false;
             this.ResumeLayout(false);
 
+        }
+
+        private void ButtonGameSettings_Click(object sender, EventArgs e)
+        {
+            panel2.Controls.Add(panelGameSettings);
+            panelGameSettings.BringToFront();
+        }
+
+        private void ButtonClosePanel_Click(object sender, EventArgs e)
+        {
+            panel2.Controls.Remove(panelGameSettings);
         }
     }
 }
