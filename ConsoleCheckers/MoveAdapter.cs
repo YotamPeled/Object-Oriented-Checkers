@@ -1,9 +1,12 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
     internal class MoveAdapter : IMove
     {
+        public bool isNextMoveCapture { get; set; } = false;
+        public List<IMove> DoubleCapturesList { get; set; }
         CheckersMove m_Move;
         public MoveAdapter(CheckersMove i_Move) 
         {
@@ -12,17 +15,17 @@ namespace ConsoleCheckers
 
         public uint GetStartSquare()
         {
-            return BitUtils.BitPositionToUInt(m_Move.MoveValue & 0b0000000000011111);
+            return BitUtils.BitPositionToUInt((int)(m_Move.MoveValue & 0b11111));
         }
 
         public uint GetTargetSquare()
         {
-            return BitUtils.BitPositionToUInt((m_Move.MoveValue & 0b0000001111100000) >> 5);
+            return BitUtils.BitPositionToUInt((int)(m_Move.MoveValue >> 5) & 0b11111);
         }
 
         public uint GetCaptureSquare()
         {
-            return BitUtils.BitPositionToUInt((m_Move.MoveValue & 0b0111110000000000) >> 10);
+            return BitUtils.BitPositionToUInt((int)(m_Move.MoveValue >> 10) & 0b11111);
         }
 
         public bool IsCapture()
@@ -33,8 +36,7 @@ namespace ConsoleCheckers
 
         public bool IsPromotion()
         {
-            bool isPromotion = ((m_Move.MoveValue & 0b1000000000000000) >> 15) == 1;
-            return isPromotion;
+            return m_Move.IsPromotion();
         }
 
         public int GetIntStartSquare()
@@ -51,6 +53,37 @@ namespace ConsoleCheckers
         public int GetIntCaptureSquare()
         {
             return PieceMethods.UIntToInt(GetCaptureSquare());
+        }
+
+        public bool IsDoubleCapture()
+        {
+            return isNextMoveCapture;
+        }
+
+        public int GetMovingPieceValue()
+        {
+            return (int)m_Move.GetMovingPieceType() - 1;
+        }
+
+        public int GetCapturedPieceValue()
+        {
+            return (int)m_Move.GetCapturedPieceType() - 1;
+        }
+
+        public void addDoubleCapture(IMove i_Move)
+        {
+            if (DoubleCapturesList == null)
+            {
+                DoubleCapturesList = new List<IMove>();
+                isNextMoveCapture = true;
+            }
+
+            DoubleCapturesList.Add(i_Move);
+        }
+
+        public uint GetMoveValue()
+        {
+            return m_Move.MoveValue;
         }
     }
 }

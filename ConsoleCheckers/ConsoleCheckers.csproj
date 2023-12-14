@@ -56,18 +56,25 @@
     <Compile Include="CheckersButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CheckersComputer.cs" />
+    <Compile Include="CheckersComputerMatchManager.cs" />
     <Compile Include="CheckersMove.cs" />
     <Compile Include="ConsoleUI.cs" />
     <Compile Include="eColor.cs" />
+    <Compile Include="EvaluationMethodsFactory.cs" />
     <Compile Include="FormsUI.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormsUIDesign.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ICheckersComputer.cs" />
     <Compile Include="ImageUtils.cs" />
-    <Compile Include="Move.cs" />
+    <Compile Include="IMatchManager.cs" />
+    <Compile Include="IMove.cs" />
+    <Compile Include="IUI.cs" />
     <Compile Include="MoveAdapter.cs" />
+    <Compile Include="OnePlayerMatchManager.cs" />
     <Compile Include="PieceMethods.cs" />
     <Compile Include="ePiece.cs" />
     <Compile Include="PositionInitializer.cs" />
@@ -80,6 +87,7 @@
     </Compile>
     <Compile Include="ShiftingFunctionsFactory.cs" />
     <Compile Include="GameMasterSingleton.cs" />
+    <Compile Include="TwoPlayerMatchManager.cs" />
     <Compile Include="UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>

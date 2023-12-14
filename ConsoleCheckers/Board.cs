@@ -10,8 +10,9 @@ namespace ConsoleCheckers
 {
     public class Board
     {
-        private bool m_Ongoing = true;
-        public bool GameOngoing { get { return m_Ongoing; } }
+        public List<uint[]> PositionsHistory { get; } = new List<uint[]>();
+        private bool m_OngoingGame = true;
+        public bool GameOngoing { get { return m_OngoingGame; } }
         private List<IMove> m_LegalMoves = new List<IMove>();
         public List<IMove> LegalMoves
         {
@@ -39,6 +40,9 @@ namespace ConsoleCheckers
         }
         public event Action<eColor> GameEnded;
         public event Action<IMove> MadeMove;
+        public event Action TurnChanged;
+        public event Action ReadyForNextMove;
+
         public ePiece this[int i, int j]
         {
             get
@@ -87,135 +91,88 @@ namespace ConsoleCheckers
             GenerateLegalMoves();
         }
 
+        public Board(uint[] i_BitBoards)
+        {
+            m_BitBoards = i_BitBoards;
+            constructBoardFromBitBoards();
+        }
+
         public void newBoard()
         {
             m_BitBoards = new uint[4];
-            m_Board = new ePiece[8, 8];
-            PositionInitializer.gameEndTest(this);
+            PositionInitializer.Starting(this);
+            constructBoardFromBitBoards();
         }
 
-        private IEnumerable<int> FindCells(Func<ePiece, bool> condition)
+        public void StartGame()
         {
-            for (int i = 0; i < m_Board.GetLength(0); i++)
+            if (m_OngoingGame)
             {
-                for (int j = 0; j < m_Board.GetLength(1); j++)
-                {
-                    if (condition(this[i, j]))
-                    {
-                        yield return i * 10 + j;
-                    }
-                }
+                ReadyForNextMove?.Invoke();
             }
         }
 
-        public void GenerateLegalMoves()
+        public void GenerateLegalMoves(bool isDoubleCapture = false)
         {  
-            m_LegalMoves = PieceMethods.GiveLegalMoves(BitBoards, m_ColorTurn);
+            m_LegalMoves = PieceMethods.GiveLegalMoves(BitBoards, m_ColorTurn, isDoubleCapture);
         }
 
-        public bool MakeMove(int i_Start, int i_Target)
+        public bool MakeMove(IMove i_Move)
         {
             // check the legal move's list for move's existance
             bool isMoveLegal = false;
-            if (PieceMethods.CheckValidInt(i_Start) && PieceMethods.CheckValidInt(i_Target))
+            
+            foreach (IMove move in LegalMoves)
             {
-                foreach (IMove move in LegalMoves)
+                if (i_Move.GetMoveValue() == move.GetMoveValue())
                 {
-                    if(move.GetIntStartSquare() == i_Start && move.GetIntTargetSquare() == i_Target)
-                    {
-                        isMoveLegal = true;
-                        updateMove(i_Start, i_Target, move);
-                        break;
-                    }
+                    isMoveLegal = true;
+                    updateMove(move);
+                    break;
                 }
             }
 
+            if (GameOngoing)
+            {
+                ReadyForNextMove?.Invoke();
+            }
             return isMoveLegal;
         }
 
-        private void updateMove(int i_From, int i_To, IMove i_PlayedMove)
+
+        private void updateMove(IMove move)
         {
-            bool swapTurn = true;
-            int iFrom, jFrom, iTo, jTo, iCapture, jCapture;
-            PieceMethods.IntToCoordinate(i_From, out iFrom, out jFrom);
-            PieceMethods.IntToCoordinate(i_To, out iTo, out jTo);
-            if (i_PlayedMove.IsCapture())
-            {
-                PieceMethods.IntToCoordinate(i_PlayedMove.GetIntCaptureSquare(), out iCapture, out jCapture);
-                updateBitBoard(i_PlayedMove, this[iFrom, jFrom], this[iCapture, jCapture]);
-                this[iCapture, jCapture] = ePiece.None;
-            }
-            else
-            {
-                updateBitBoard(i_PlayedMove, this[iFrom, jFrom]);
-            }
-
-            this[iTo, jTo] = this[iFrom, jFrom];
-            this[iFrom, jFrom] = ePiece.None;
-            PromotionCheck(iTo, jTo, i_PlayedMove);
-            MadeMove?.Invoke(i_PlayedMove);
-            if (gameContinueCheck())
-            {
-                // check if more captures are available, and if there are don't swap turn
-                if (i_PlayedMove.IsCapture())
-                {
-                    swapTurn &= !checkForAvailableCaptures(i_PlayedMove);
-                }
-
-                if (swapTurn)
-                {
-                    // changeTurn method also generates legal moves for next turn
-                    changeTurn();
-                }
-            }
-        }
-
-        private void PromotionCheck(int iTarget, int jTarget, IMove i_PlayedMove)
-        {
-            ePiece movedPiece = this[iTarget, jTarget];
-            if (movedPiece != ePiece.qWhite && movedPiece != ePiece.qBlack && i_PlayedMove.IsPromotion())
-            {
-                if (movedPiece == ePiece.sWhite)
-                {
-                    promoteWhite(i_PlayedMove);
-                    this[iTarget, jTarget] = ePiece.qWhite;
-                }
-                else if(movedPiece == ePiece.sBlack)
-                {
-                    promoteBlack(i_PlayedMove);
-                    this[iTarget, jTarget] = ePiece.qBlack;
-                }
-            }
-        }
-
-        private void promoteBlack(IMove i_PlayedMove)
-        {
-            // remove the solider piece 
-            BitBoards[(int)ePiece.sBlack - 1] ^= i_PlayedMove.GetTargetSquare();
-            // add queen piece
-            BitBoards[(int)ePiece.qBlack - 1] |= i_PlayedMove.GetTargetSquare();
-        }
-
-        private void promoteWhite(IMove i_PlayedMove)
-        {
-            // remove the solider piece 
-            BitBoards[(int)ePiece.sWhite - 1] ^= i_PlayedMove.GetTargetSquare();
-            // add queen piece
-            BitBoards[(int)ePiece.qWhite - 1] |= i_PlayedMove.GetTargetSquare();
+            PieceMethods.MakeMove(move, m_BitBoards);
+            constructBoardFromBitBoards();
+            onMadeMove(move);          
         }
     
 
+        protected virtual void onMadeMove(IMove i_Move)
+        {
+            MadeMove?.Invoke(i_Move);
+            if (i_Move.IsDoubleCapture())
+            {
+                // don't swap turn and generate legal moves
+                bool isDoubleCapture = true;
+                GenerateLegalMoves(isDoubleCapture);
+            }
+            else if (gameContinueCheck())
+            {
+                changeTurn();
+            }
+        }
         private bool gameContinueCheck()
         {
             bool isWhiteAlive = (BitBoards[(int)ePiece.sWhite - 1] | BitBoards[(int)ePiece.qWhite - 1]) != 0;
             bool isBlackAlive = (BitBoards[(int)ePiece.sBlack - 1] | BitBoards[(int)ePiece.qBlack - 1]) != 0;
-            bool isOngoingGame = isBlackAlive && isWhiteAlive;
-            if (!isOngoingGame)
+            m_OngoingGame = isBlackAlive && isWhiteAlive;
+            if (!m_OngoingGame)
             {
                 OnGameEnd(isWhiteAlive);
             }
 
-            return isOngoingGame;
+            return m_OngoingGame;
         }
 
         private void OnGameEnd(bool i_WhiteStatus)
@@ -226,50 +183,7 @@ namespace ConsoleCheckers
                 winningColor = eColor.White;
             }
 
-            m_Ongoing = false;
             GameEnded?.Invoke(winningColor);
-        }
-        private void updateBitBoard(IMove i_Move, ePiece i_PieceMakingMove, ePiece i_Captured = ePiece.None)
-        {
-            // xor with the move made, meaning, remove origin location and add destination location to BitBoard
-            m_BitBoards[(int)i_PieceMakingMove - 1] ^= i_Move.GetStartSquare() | i_Move.GetTargetSquare();
-            if (i_Move.IsCapture())
-            {
-                m_BitBoards[(int)i_Captured - 1] ^= i_Move.GetCaptureSquare();
-            }
-        }
-
-        private bool checkForAvailableCaptures(IMove i_Move)
-        {
-            bool availableCapture = false;
-            // generate legal moves for new position after a move
-            GenerateLegalMoves();
-            foreach (IMove move in m_LegalMoves)
-            {
-                // if the piece that just move can capture another piece
-                if (move.IsCapture() && move.GetStartSquare() == i_Move.GetTargetSquare())
-                {
-                    availableCapture = true;
-                    break;
-                }
-            }
-
-            return availableCapture;
-        }
-
-        internal bool IsSquareInPlay(int i_Square)
-        {
-            bool isSquareInPlay = false;
-            foreach(IMove move in LegalMoves)
-            {
-                if (PieceMethods.UIntToInt(move.GetStartSquare()) == i_Square)
-                {
-                    isSquareInPlay = true;
-                    break;
-                }
-            }
-
-            return isSquareInPlay;
         }
 
         private void changeTurn()
@@ -284,10 +198,13 @@ namespace ConsoleCheckers
             }
 
             GenerateLegalMoves();
-            noLegalMovesCheck();
+            if (!noLegalMovesCheck())
+            {
+                TurnChanged?.Invoke();
+            }
         }
 
-        private void noLegalMovesCheck()
+        private bool noLegalMovesCheck()
         {
             // no legal moves available
             if (m_LegalMoves.Count == 0)
@@ -295,7 +212,44 @@ namespace ConsoleCheckers
                 // black has no legal moves and thus white is the winner
                 bool isWhiteWinning = m_ColorTurn == eColor.Black;
                 OnGameEnd(isWhiteWinning);
+                return true;
             }
+
+            return false;
+        }
+
+        private void constructBoardFromBitBoards()
+        {
+            m_Board = new ePiece[8, 8];
+            foreach (uint whiteSolider in BitUtils.GetSetBits(m_BitBoards[(int)ePiece.sWhite - 1]))
+            {
+                setBitPositionOnBoard(ePiece.sWhite, whiteSolider);
+            }
+
+            foreach(uint blackSolider in BitUtils.GetSetBits(m_BitBoards[(int)ePiece.sBlack - 1]))
+            {
+                setBitPositionOnBoard(ePiece.sBlack, blackSolider);
+            }
+
+            foreach(uint whiteQueen in BitUtils.GetSetBits(m_BitBoards[(int)ePiece.qWhite - 1]))
+            {
+                setBitPositionOnBoard(ePiece.qWhite, whiteQueen);
+            }
+
+            foreach (uint blackQueen in BitUtils.GetSetBits(m_BitBoards[(int)ePiece.qBlack - 1]))
+            {
+                setBitPositionOnBoard(ePiece.qBlack, blackQueen);
+            }
+
+            PositionsHistory.Add(m_BitBoards.ToArray());
+        }
+
+        private void setBitPositionOnBoard(ePiece i_PieceToSet, uint pieceLocation)
+        {
+            int i, j;
+            int location = PieceMethods.UIntToInt(pieceLocation);
+            PieceMethods.IntToCoordinate(location, out i, out j);
+            m_Board[i, j] = i_PieceToSet;
         }
     }
 }

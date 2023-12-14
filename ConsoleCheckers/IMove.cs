@@ -8,13 +8,17 @@ namespace ConsoleCheckers
 {
     public interface IMove
     {
-        int GetIntStartSquare();
-        int GetIntTargetSquare();
-        int GetIntCaptureSquare();
+        // change in the future to properties
+        List<IMove> DoubleCapturesList { get; set; }
+        uint GetMoveValue();
+        void addDoubleCapture(IMove i_Move);
+        int GetMovingPieceValue();
+        int GetCapturedPieceValue();
         uint GetTargetSquare();
         uint GetStartSquare();
         uint GetCaptureSquare();
         bool IsCapture();
         bool IsPromotion();
+        bool IsDoubleCapture();
     }
 }

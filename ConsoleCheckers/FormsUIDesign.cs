@@ -11,6 +11,16 @@ namespace ConsoleCheckers
 {
     public partial class FormsUI : Form
     {
+        private YotamButton buttonPreviousMove;
+        private YotamButton buttonNextMove;
+        private YotamButton buttonExit;
+        private YotamPanel panelChooseOponent;
+        private YotamButton buttonChooseComputerGame;
+        private YotamButton buttonChooseComputer;
+        private YotamButton buttonChoose2Player;
+        private YotamButton ButtonStartMatch;
+        private YotamButton ComputerMatch;
+        private YotamPanel panelCompueterSettings;
         private TrackBar TrackBarQueenMoveLimit;
         private Label LabelQueenMoveLimit;
         private Label LabelQueenLimitText;
@@ -83,15 +93,36 @@ namespace ConsoleCheckers
         private CheckersButton CheckersButton14;
         private CheckersButton CheckersButton15;
         private CheckersButton CheckersButton16;
-        private YotamButton ResignButton;
+        private YotamButton QuitButton;
         private YotamButton ButtonGameSettings;
-        private YotamButton ButtonComputerSettings;
         private YotamPanel panel3;
         private YotamPanel panelGameSettings;
         private YotamButton ButtonClosePanel;
+        private Panel panel1;
+        private Label labelChooseComputer2;
+        private Label labelChooseComputer1;
+        private ComboBox comboBoxComputer2;
+        private ComboBox comboBoxComputer1;
+        private Label labelDepth;
+        private NumericUpDown numericUpDownDepth;
+        private Label labelChooseWhite;
+        private ComboBox comboBoxChooseWhite;
 
         private void InitializeComponent()
         {
+            buttonPreviousMove = new YotamButton();
+            buttonNextMove = new YotamButton();
+            buttonExit = new YotamButton();
+            panel1 = new Panel();
+            labelDepth = new Label();
+            numericUpDownDepth = new NumericUpDown();
+            labelChooseComputer2 = new Label();
+            labelChooseComputer1 = new Label();
+            comboBoxComputer2 = new ComboBox();
+            comboBoxComputer1 = new ComboBox();
+            comboBoxChooseWhite = new ComboBox();
+            labelChooseWhite = new Label();
+            ButtonStartMatch = new YotamButton();
             bool fill = true;
             mainPanel = new YotamPanel(!fill);
             this.panelCheckers = new YotamPanel(!fill);
@@ -162,9 +193,9 @@ namespace ConsoleCheckers
             this.CheckersButton63 = new CheckersButton(BitUtils.BitPositionToUInt(25));
             this.CheckersButton64 = new CheckersButton(0);
             this.ButtonGameSettings = new YotamControls.YotamButton();
-            this.ButtonComputerSettings = new YotamControls.YotamButton();
-            this.ResignButton = new YotamControls.YotamButton();
+            this.QuitButton = new YotamControls.YotamButton();
             this.panelGameSettings = new YotamPanel();
+            this.panelCompueterSettings = new YotamPanel();
             this.panelCheckers.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -241,8 +272,77 @@ namespace ConsoleCheckers
             this.panelCheckers.TabIndex = 0;
             panelCheckers.ChangeColor(30);
             //
-            //mainPanel
+            //Computer Match
             //
+            panelChooseOponent = new YotamPanel(!fill);
+            buttonChoose2Player = new YotamButton();
+            buttonChooseComputer = new YotamButton();
+            buttonChooseComputerGame = new YotamButton();
+
+            // 
+            // buttonPreviousMove
+            // 
+            buttonPreviousMove.Location = new Point(792, 671);
+            buttonPreviousMove.Name = "buttonPreviousMove";
+            buttonPreviousMove.Size = new Size(64, 42);
+            buttonPreviousMove.TabIndex = 0;
+            buttonPreviousMove.Text = "Prev";
+            buttonPreviousMove.UseVisualStyleBackColor = true;
+            buttonPreviousMove.SelectThemeColor(32);
+            buttonPreviousMove.Click += ButtonPrev_Click;
+            // 
+            // buttonNextMove
+            // 
+            buttonNextMove.Location = new Point(865, 671);
+            buttonNextMove.Name = "buttonNextMove";
+            buttonNextMove.Size = new Size(64, 42);
+            buttonNextMove.TabIndex = 1;
+            buttonNextMove.Text = "Next";
+            buttonNextMove.UseVisualStyleBackColor = true;
+            buttonNextMove.SelectThemeColor(32);
+            buttonNextMove.Click += ButtonNext_Click;
+
+            panelChooseOponent.Controls.Add(buttonChooseComputerGame);
+            panelChooseOponent.Controls.Add(buttonChooseComputer);
+            panelChooseOponent.Controls.Add(buttonChoose2Player);
+            panelChooseOponent.Location = new Point(200, 200);
+            panelChooseOponent.Name = "panelChooseOponent";
+            panelChooseOponent.Size = new Size(542, 193);
+            panelChooseOponent.TabIndex = 0;
+            panelChooseOponent.ChangeColor(30);
+            // 
+            // buttonChoose2Player
+            // 
+            buttonChoose2Player.Location = new Point(3, 3);
+            buttonChoose2Player.Name = "buttonChoose2Player";
+            buttonChoose2Player.Size = new Size(536, 58);
+            buttonChoose2Player.TabIndex = 0;
+            buttonChoose2Player.Text = "2 Player";
+            buttonChoose2Player.UseVisualStyleBackColor = true;
+            buttonChoose2Player.SelectThemeColor(7);
+            buttonChoose2Player.Click += ButtonStart2PlayerMatch_Click;
+            // 
+            // buttonChooseComputer
+            // 
+            buttonChooseComputer.Location = new Point(3, 67);
+            buttonChooseComputer.Name = "buttonChooseComputer";
+            buttonChooseComputer.Size = new Size(536, 58);
+            buttonChooseComputer.TabIndex = 1;
+            buttonChooseComputer.Text = "1 Player";
+            buttonChooseComputer.UseVisualStyleBackColor = true;
+            buttonChooseComputer.SelectThemeColor(8);
+            buttonChooseComputer.Click += ButtonHumanVsComputer_Click;
+            // 
+            // buttonChooseComputerGame
+            // 
+            buttonChooseComputerGame.Location = new Point(3, 131);
+            buttonChooseComputerGame.Name = "buttonChooseComputerGame";
+            buttonChooseComputerGame.Size = new Size(536, 58);
+            buttonChooseComputerGame.TabIndex = 2;
+            buttonChooseComputerGame.Text = "Computer Game";
+            buttonChooseComputerGame.UseVisualStyleBackColor = true;
+            buttonChooseComputerGame.SelectThemeColor(17);
+            buttonChooseComputerGame.Click += ButtonComputerMatch_Click;
             // 
             // CheckersButton8
             // 
@@ -310,9 +410,8 @@ namespace ConsoleCheckers
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.ResignButton);
+            this.panel2.Controls.Add(this.QuitButton);
             this.panel2.Controls.Add(this.ButtonGameSettings);
-            this.panel2.Controls.Add(this.ButtonComputerSettings);
             this.panel2.Location = new System.Drawing.Point(792, 50);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(137, 615);
@@ -785,42 +884,129 @@ namespace ConsoleCheckers
             ButtonGameSettings.SelectThemeColor(32);
             ButtonGameSettings.Click += ButtonGameSettings_Click;
             // 
-            // CheckersButton66
-            // 
-            this.ButtonComputerSettings.Location = new System.Drawing.Point(3, 80);
-            this.ButtonComputerSettings.Name = "ButtonComputerSettings";
-            this.ButtonComputerSettings.Size = new System.Drawing.Size(131, 71);
-            this.ButtonComputerSettings.TabIndex = 1;
-            this.ButtonComputerSettings.UseVisualStyleBackColor = true;
-            this.ButtonComputerSettings.Text = "Computer Settings";
-            ButtonComputerSettings.SelectThemeColor(32);
-            // 
             // CheckersButton67
             // 
-            this.ResignButton.Location = new System.Drawing.Point(3, 541);
-            this.ResignButton.Name = "CheckersButton67";
-            this.ResignButton.Size = new System.Drawing.Size(131, 71);
-            this.ResignButton.TabIndex = 2;
-            this.ResignButton.UseVisualStyleBackColor = true;
-            ResignButton.Text = "Resign";
-            ResignButton.SelectThemeColor(8);
+            this.QuitButton.Location = new System.Drawing.Point(3, 541);
+            this.QuitButton.Name = "CheckersButton67";
+            this.QuitButton.Size = new System.Drawing.Size(131, 71);
+            this.QuitButton.TabIndex = 2;
+            this.QuitButton.UseVisualStyleBackColor = true;
+            QuitButton.Text = "Quit";
+            QuitButton.SelectThemeColor(8);
+            QuitButton.Click += ButtonQuit_Click;
             //
             //Button Close Panel
             //
             ButtonClosePanel = new YotamButton();
             this.ButtonClosePanel.SelectThemeColor(8);
             ButtonClosePanel.Name = "ButtonClosePanel";
-            ButtonClosePanel.Size = this.ResignButton.Size = new System.Drawing.Size(131, 71);
+            ButtonClosePanel.Size = this.QuitButton.Size = new System.Drawing.Size(131, 71);
             ButtonClosePanel.Location = new Point(3, 541);
             ButtonClosePanel.Text = "Close";
             ButtonClosePanel.Click += ButtonClosePanel_Click;
+
+            ComputerMatch = new YotamButton();
+            ComputerMatch.SelectThemeColor(17);
+            ComputerMatch.Location = ButtonGameSettings.Location;
+            ComputerMatch.Size = ButtonGameSettings.Size;
+            ComputerMatch.Text = "Enable Computer Match";
+            ComputerMatch.Click += ButtonComputerMatch_Click;
+
+            ButtonStartMatch.SelectThemeColor(24);
+            ButtonStartMatch.Location = new Point(12, 137); 
+            ButtonStartMatch.Size = new Size(518, 44);
+            ButtonStartMatch.Text = "Start";
+
+            buttonExit.Location = new Point(506, 4);
+            buttonExit.Name = "buttonExit";
+            buttonExit.Size = new Size(33, 33);
+            buttonExit.TabIndex = 9;
+            buttonExit.Text = "X";
+            buttonExit.UseVisualStyleBackColor = true;
+            buttonExit.TextAlign = ContentAlignment.MiddleCenter; // Align text to the center
+            buttonExit.Click += ButtonExit_Click;
+            buttonExit.SelectThemeColor(8);
+
+            labelDepth.AutoSize = true;
+            labelDepth.Location = new Point(239, 24);
+            labelDepth.Name = "labelDepth";
+            labelDepth.Size = new Size(52, 15);
+            labelDepth.TabIndex = 5;
+            labelDepth.Text = "Strength";
+            labelDepth.ForeColor = System.Drawing.Color.White;
+            // 
+            // numericUpDownDepth
+            // 
+            numericUpDownDepth.Location = new Point(248, 42);
+            numericUpDownDepth.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            numericUpDownDepth.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDownDepth.Name = "numericUpDownDepth";
+            numericUpDownDepth.Size = new Size(34, 23);
+            numericUpDownDepth.TabIndex = 4;
+            numericUpDownDepth.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // labelChooseComputer2
+            // 
+            labelChooseComputer2.AutoSize = true;
+            labelChooseComputer2.Location = new Point(27, 80);
+            labelChooseComputer2.Name = "labelChooseComputer2";
+            labelChooseComputer2.Size = new Size(113, 15);
+            labelChooseComputer2.TabIndex = 3;
+            labelChooseComputer2.Text = "Choose Computer 2";
+            labelChooseComputer2.ForeColor = System.Drawing.Color.White;
+            // 
+            // labelChooseComputer1
+            // 
+            labelChooseComputer1.AutoSize = true;
+            labelChooseComputer1.Location = new Point(27, 24);
+            labelChooseComputer1.Name = "labelChooseComputer1";
+            labelChooseComputer1.Size = new Size(113, 15);
+            labelChooseComputer1.TabIndex = 2;
+            labelChooseComputer1.Text = "Choose Computer";
+            labelChooseComputer1.ForeColor = System.Drawing.Color.White;
+            // 
+            // comboBoxComputer2
+            // 
+            comboBoxComputer2.FormattingEnabled = true;
+            comboBoxComputer2.Location = new Point(27, 98);
+            comboBoxComputer2.Name = "comboBoxComputer2";
+            comboBoxComputer2.Size = new Size(113, 23);
+            comboBoxComputer2.TabIndex = 1;
+            UIUtils.AddComputerOptions(comboBoxComputer2);
+            // 
+            // comboBoxComputer1
+            // 
+            comboBoxComputer1.FormattingEnabled = true;
+            comboBoxComputer1.Location = new Point(27, 42);
+            comboBoxComputer1.Name = "comboBoxComputer1";
+            comboBoxComputer1.Size = new Size(113, 23);
+            comboBoxComputer1.TabIndex = 0;
+            UIUtils.AddComputerOptions(comboBoxComputer1);
+            // 
+            // comboBoxChooseWhite
+            // 
+            comboBoxChooseWhite.FormattingEnabled = true;
+            comboBoxChooseWhite.Location = new Point(392, 42);
+            comboBoxChooseWhite.Name = "comboBoxChooseWhite";
+            comboBoxChooseWhite.Size = new Size(81, 23);
+            comboBoxChooseWhite.TabIndex = 6;
+            // 
+            // labelChooseWhite
+            // 
+            labelChooseWhite.AutoSize = true;
+            labelChooseWhite.Location = new Point(392, 24);
+            labelChooseWhite.Name = "labelChooseWhite";
+            labelChooseWhite.Size = new Size(81, 15);
+            labelChooseWhite.TabIndex = 7;
+            labelChooseWhite.Text = "Choose White";
+            labelChooseWhite.ForeColor = System.Drawing.Color.White;
             //
             //panelsCapture
             //
             panelWhiteCapture = new YotamImagePanel();
             panelBlackCapture = new YotamImagePanel();
-            panelWhiteCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Top - 35);
-            panelBlackCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Bottom + 5);
+            panelBlackCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Top - 35);
+            panelWhiteCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Bottom + 5);
             panelWhiteCapture.Size = new Size(panelCheckers.Width, 30);
             panelBlackCapture.Size = new Size(panelCheckers.Width, 30);
             panelBlackCapture.ChangeColor(31);
@@ -834,13 +1020,28 @@ namespace ConsoleCheckers
             //
             panelGameSettings.Size = panel2.Size;
             panelGameSettings.ChangeColor(32);
-            panelGameSettings.Controls.Add(ButtonClosePanel);
             LabelQueenMoveLimit = new Label();
             LabelQueenLimitText = new Label();
             TrackBarQueenMoveLimit = new TrackBar();
             panelGameSettings.Controls.Add(LabelQueenLimitText);
             panelGameSettings.Controls.Add(LabelQueenMoveLimit);
             panelGameSettings.Controls.Add(TrackBarQueenMoveLimit);
+            //
+            // panel computer settings
+            //
+            panelCompueterSettings.Size = panel2.Size;
+            panelCompueterSettings.ChangeColor(32);
+            panelCompueterSettings.Controls.Add(ComputerMatch);
+            panelCompueterSettings.Controls.Add(ButtonStartMatch);
+            panelCompueterSettings.Controls.Add(labelDepth);
+            panelCompueterSettings.Controls.Add(numericUpDownDepth);
+            panelCompueterSettings.Controls.Add(labelChooseComputer2);
+            panelCompueterSettings.Controls.Add(labelChooseComputer1);
+            panelCompueterSettings.Controls.Add(comboBoxComputer1);
+            panelCompueterSettings.Controls.Add(comboBoxComputer2);
+            panelCompueterSettings.Controls.Add(comboBoxChooseWhite);
+            panelCompueterSettings.Controls.Add(labelChooseWhite);
+
             // 
             // LabelQueenMoveLimit
             // 
@@ -889,6 +1090,13 @@ namespace ConsoleCheckers
             this.mainPanel.Controls.Add(panelCheckers);
             this.mainPanel.Controls.Add(panelWhiteCapture);
             this.mainPanel.Controls.Add(panelBlackCapture);
+            mainPanel.Controls.Add(buttonNextMove);
+            mainPanel.Controls.Add(buttonPreviousMove);
+            
+            mainPanel.Controls.Add(panelChooseOponent);
+            hideCheckersBoardPanels();
+
+
             panelWhiteCapture.RefreshPanel();
             this.Controls.Add(this.mainPanel);
             this.Name = "FormsUI";
@@ -900,15 +1108,257 @@ namespace ConsoleCheckers
 
         }
 
+        private void ButtonExit_Click(object sender, EventArgs e)
+        {
+            hideSelectionOptions();
+            showPanelSetupGame();
+        }
+
+        private void showPanelSetupGame()
+        {
+            panelChooseOponent.Controls.Add(buttonChoose2Player);
+            panelChooseOponent.Controls.Add(buttonChooseComputerGame);
+            panelChooseOponent.Controls.Add(buttonChooseComputer);
+        }
+
+
+        private void ButtonQuit_Click(object sender, EventArgs e)
+        {
+            GameMasterSingleton.Instance.Board = null;
+            GameMasterSingleton.Instance.MatchManager.StopMatch();
+            hideCheckersBoardPanels();
+            showPanelSetupGame();
+        }
+
+        private void hideSelectionOptions()
+        {
+            panelChooseOponent.Controls.Remove(comboBoxComputer1);
+            panelChooseOponent.Controls.Remove(labelChooseComputer2);
+            panelChooseOponent.Controls.Remove(labelChooseComputer1);
+            panelChooseOponent.Controls.Remove(ButtonStartMatch);
+            panelChooseOponent.Controls.Remove(labelChooseWhite);
+            panelChooseOponent.Controls.Remove(comboBoxComputer2);
+            panelChooseOponent.Controls.Remove(comboBoxChooseWhite);
+            panelChooseOponent.Controls.Remove(labelDepth);
+            panelChooseOponent.Controls.Remove(numericUpDownDepth);
+            panelChooseOponent.Controls.Remove(buttonExit);
+        }
+
         private void ButtonGameSettings_Click(object sender, EventArgs e)
         {
+            panelGameSettings.Controls.Add(ButtonClosePanel);
             panel2.Controls.Add(panelGameSettings);
             panelGameSettings.BringToFront();
         }
 
         private void ButtonClosePanel_Click(object sender, EventArgs e)
         {
-            panel2.Controls.Remove(panelGameSettings);
+            YotamPanel parentPanel = (sender as Control).Parent as YotamPanel;
+            panel2.Controls.Remove(parentPanel);
+        }
+
+        private void ButtonComputerMatch_Click(object sender, EventArgs e)
+        {
+            comboBoxChooseWhite.Items.Clear();
+            comboBoxChooseWhite.Items.AddRange(new object[] { "Computer1", "Computer2" });
+            panel2.Controls.Remove(ButtonGameSettings);
+            panelChooseOponent.Controls.Remove(buttonChoose2Player);
+            panelChooseOponent.Controls.Remove(buttonChooseComputerGame);
+            panelChooseOponent.Controls.Remove(buttonChooseComputer);
+            panelChooseOponent.Controls.Add(comboBoxComputer1);
+            panelChooseOponent.Controls.Add(labelChooseComputer2);
+            panelChooseOponent.Controls.Add(labelChooseComputer1);
+            panelChooseOponent.Controls.Add(ButtonStartMatch);
+            panelChooseOponent.Controls.Add(labelChooseWhite);
+            panelChooseOponent.Controls.Add(comboBoxComputer2);
+            panelChooseOponent.Controls.Add(comboBoxChooseWhite);
+            panelChooseOponent.Controls.Add(labelDepth);
+            panelChooseOponent.Controls.Add(numericUpDownDepth);
+            panelChooseOponent.Controls.Add(buttonExit);
+            ButtonStartMatch.Click += ButtonStartComputerMatch_Click;
+        }
+
+        private void ButtonHumanVsComputer_Click(object sender, EventArgs e)
+        {
+            comboBoxChooseWhite.Items.Clear();
+            comboBoxChooseWhite.Items.AddRange(new object[] { "Player", "Computer" });
+            panelChooseOponent.Controls.Remove(buttonChoose2Player);
+            panelChooseOponent.Controls.Remove(buttonChooseComputerGame);
+            panelChooseOponent.Controls.Remove(buttonChooseComputer);
+            panelChooseOponent.Controls.Add(comboBoxComputer1);
+            panelChooseOponent.Controls.Add(labelChooseComputer1);
+            panelChooseOponent.Controls.Add(ButtonStartMatch);
+            panelChooseOponent.Controls.Add(labelChooseWhite);
+            panelChooseOponent.Controls.Add(comboBoxChooseWhite);
+            panelChooseOponent.Controls.Add(labelDepth);
+            panelChooseOponent.Controls.Add(numericUpDownDepth);
+            panelChooseOponent.Controls.Add(buttonExit);
+            ButtonStartMatch.Click += ButtonStart1PlayerMatch_Click;
+        }
+
+        private void ButtonStart2PlayerMatch_Click(object sender, EventArgs e)
+        {
+            GameMasterSingleton.Instance.Board = new Board();
+            this.Reset();
+            showCheckersBoardPanels();
+            Start2PlayerMatch();
+        }
+
+        private void showCheckersBoardPanels()
+        {
+            panelChooseOponent.Visible = false;
+            panelBlackCapture.Visible = true;
+            panelWhiteCapture.Visible = true;
+            panel2.Visible = true;
+            panelCheckers.Visible = true;
+            buttonPreviousMove.Visible = true;
+            buttonNextMove.Visible = true;
+    }
+
+        private void hideCheckersBoardPanels()
+        {
+            panelChooseOponent.Visible = true;
+            panelBlackCapture.Visible = false;
+            panelWhiteCapture.Visible = false;
+            panel2.Visible = false;
+            panelCheckers.Visible = false;
+            buttonPreviousMove.Visible = false;
+            buttonNextMove.Visible = false;
+        }
+
+        private void ButtonStart1PlayerMatch_Click(object sender, EventArgs e)
+        {
+            Button clickedButton = sender as Button;
+            bool validComputer1 = validateComputerMatchEntry(clickedButton, comboBoxComputer1, labelChooseComputer1);
+            bool validColorChoice = validateComputerMatchEntry(clickedButton, comboBoxChooseWhite, labelChooseWhite);
+            bool validEntry = validComputer1 && validColorChoice;
+            if (validEntry)
+            {
+                showValidButtonPress(clickedButton);
+                GameMasterSingleton.Instance.Board = new Board();
+                this.Reset();
+
+                bool isPlayerStarting = comboBoxChooseWhite.Text.Equals("Player");
+                GameMasterSingleton.Instance.ComputerDepth = (int)numericUpDownDepth.Value;
+                EvaluationType computerStrategyType = (EvaluationType)comboBoxComputer1.SelectedIndex;
+
+                Func<uint[], int> computerStrategy = EvaluationMethodsFactory.GetEvaluationStrategy(computerStrategyType);
+
+                hideSelectionOptions();
+                showCheckersBoardPanels();
+                GameMasterSingleton.Instance.SetUp1PlayerMatch(computerStrategy, this, isPlayerStarting);
+                signUpForBoardEvents();
+                GameMasterSingleton.Instance.StartMatch();
+                clearSubscribersList(sender as Button);
+            }
+        }
+
+        private void ButtonStartComputerMatch_Click(object sender, EventArgs e)
+        {
+            Button clickedButton = sender as Button;
+            bool validComputer1 = validateComputerMatchEntry(clickedButton, comboBoxComputer1, labelChooseComputer1);
+            bool validComputer2 = validateComputerMatchEntry(clickedButton, comboBoxComputer2, labelChooseComputer2);
+            bool validColorChoice = validateComputerMatchEntry(clickedButton, comboBoxChooseWhite, labelChooseWhite);
+            bool validEntry = validComputer1 && validComputer2 && validColorChoice;
+            if (validEntry)
+            {
+                showValidButtonPress(clickedButton);
+                GameMasterSingleton.Instance.Board = new Board();
+                this.Reset();
+
+                string starting = comboBoxChooseWhite.Text;
+                bool computer1Starting = starting.Equals("Computer1");
+                GameMasterSingleton.Instance.ComputerDepth = (int)numericUpDownDepth.Value;
+                EvaluationType computer1StrategyType = (EvaluationType)comboBoxComputer1.SelectedIndex;
+                EvaluationType computer2StrategyType = (EvaluationType)comboBoxComputer2.SelectedIndex;
+
+                Func<uint[], int> computer1Strategy = EvaluationMethodsFactory.GetEvaluationStrategy(computer1StrategyType);
+                Func<uint[], int> computer2Strategy = EvaluationMethodsFactory.GetEvaluationStrategy(computer2StrategyType);
+
+                hideSelectionOptions();
+                showCheckersBoardPanels();
+                GameMasterSingleton.Instance.SetUpComputerMatch(computer1Strategy, computer2Strategy, computer1Starting);
+                signUpForBoardEvents();
+                GameMasterSingleton.Instance.StartMatch();
+                clearSubscribersList(sender as Button);
+            }
+        }
+
+        private void clearSubscribersList(Button button)
+        {
+            button.Click -= ButtonStart1PlayerMatch_Click;
+            button.Click -= ButtonStartComputerMatch_Click;
+        }
+
+        private void Start2PlayerMatch()
+        {
+            GameMasterSingleton.Instance.SetUp2PlayerMatch(this);
+            signUpForBoardEvents();
+            GameMasterSingleton.Instance.StartMatch();
+        }
+
+        private bool validateComputerMatchEntry(Button i_StartMatchButton, ComboBox i_ComboBox, Label i_LabelComboBox)
+        {
+            bool validEntry;
+            if (i_ComboBox.SelectedIndex == -1)
+            {
+                showInvalidButtonPress(i_StartMatchButton);
+                showInvalidComboBoxEntry(i_LabelComboBox);
+                validEntry = false;
+            }
+            else
+            {
+                showValidComboBoxEntry(i_LabelComboBox);
+                validEntry= true;
+            }
+
+            return validEntry;
+        }
+
+        private void showInvalidButtonPress(Button i_Button)
+        {
+            i_Button.FlatStyle = FlatStyle.Flat;
+            i_Button.FlatAppearance.BorderColor = Color.Red;
+            i_Button.FlatAppearance.BorderSize = 1;
+        }
+
+        private void showValidButtonPress(Button i_Button)
+        {
+            i_Button.FlatAppearance.BorderSize = 0;
+        }
+
+        private void showInvalidComboBoxEntry(Label i_Label)
+        {
+            i_Label.ForeColor = Color.Red;
+        }
+
+        private void showValidComboBoxEntry(Label i_Label)
+        {
+            i_Label.ForeColor = Color.White;
+        }
+
+        private void signUpForBoardEvents()
+        {
+            GameMasterSingleton.Instance.Board.MadeMove += OnMadeMove;
+            GameMasterSingleton.Instance.Board.GameEnded += OnGameEnd;
+        }
+
+        private void ButtonNext_Click(object sender, EventArgs e)
+        {
+            if (m_CurrentlyViewingPositionNumber + 1 < GameMasterSingleton.Instance.Board.PositionsHistory.Count)
+            {
+                m_CurrentlyViewingPositionNumber += 1;
+                viewHistoryPosition(m_CurrentlyViewingPositionNumber);
+            }
+        }
+
+        private void ButtonPrev_Click(object sender, EventArgs e)
+        {
+            if (m_CurrentlyViewingPositionNumber > 0)
+            {
+                m_CurrentlyViewingPositionNumber -= 1;
+                viewHistoryPosition(m_CurrentlyViewingPositionNumber);
+            }
         }
     }
 }

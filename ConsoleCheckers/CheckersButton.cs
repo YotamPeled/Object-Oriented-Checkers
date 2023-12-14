@@ -42,17 +42,12 @@ namespace ConsoleCheckers
             ImageUtils.DrawCircleOnButton(this);
         }
 
-        public void UnSelect()
-        {
-            Draw();
-        }
-
-        public void Draw()
+        public void Draw(Board i_Board)
         {
             this.Controls.Clear();
             int i, j;
             PieceMethods.IntToCoordinate(tag, out i, out j);
-            ePiece piece = GameMasterSingleton.Instance.Board[i, j];
+            ePiece piece = i_Board[i, j];
             switch(piece)
             {
                 case ePiece.sWhite:

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
@@ -21,6 +22,14 @@ namespace ConsoleCheckers
             }
 
             return isWhite;
+        }
+
+        internal static void AddComputerOptions(ComboBox i_ComboBox)
+        {
+            foreach (EvaluationType evalType in Enum.GetValues(typeof(EvaluationType)))
+            {
+                i_ComboBox.Items.Add(evalType.ToString());
+            }
         }
     }
 }

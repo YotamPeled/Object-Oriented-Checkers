@@ -7,20 +7,19 @@ using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
-    public partial class FormsUI
+    public partial class FormsUI : IUI
     {
+        private int m_CurrentlyViewingPositionNumber = 0;
+        private bool isSelectionEnabled = true;
         private uint m_SelectedSquare;
         private List<CheckersButton> m_MarkedButtons = new List<CheckersButton>();
-        private Board m_GameBoard;
         private Dictionary<uint, CheckersButton> m_PositionToButtonDict = new Dictionary<uint, CheckersButton>();
+        public event Action<IMove> PlayerMadeMove;
         public FormsUI()
         {
-            m_GameBoard = GameMasterSingleton.Instance.Board;
-            m_GameBoard.MadeMove += OnMadeMove;
-            m_GameBoard.GameEnded += OnGameEnd;
             InitializeComponent();
             fillDict();
-            loadPieceImagesAndAddActions();
+            Reset();
         }
 
         private void fillDict()
@@ -38,50 +37,58 @@ namespace ConsoleCheckers
         {
             foreach(CheckersButton button in panelCheckers.Controls)
             {
-                button.Draw();
+                button.Draw(GameMasterSingleton.Instance.Board);
                 button.Click += Button_Click;
             }
         }
 
         private void Button_Click(object sender, EventArgs e)
         {
+            if (!isSelectionEnabled || !GameMasterSingleton.Instance.PlayerTurn)
+            {
+                return;
+            }
+
             CheckersButton clickedSquare = sender as CheckersButton;
             // white square clicked
             if (clickedSquare.BitPosition == 0 || m_SelectedSquare == 0)
             {
-                select(clickedSquare.BitPosition);
+                onSelect(clickedSquare.BitPosition);
             }
             else
             {
                 bool isLegalMove = false;
-                foreach(IMove move in m_GameBoard.LegalMoves)
+                foreach(IMove move in GameMasterSingleton.Instance.Board.LegalMoves)
                 {
                     if (move.GetStartSquare() == m_SelectedSquare && move.GetTargetSquare() == clickedSquare.BitPosition)
                     {
                         isLegalMove = true;
-                        m_GameBoard.MakeMove(
-                            PieceMethods.UIntToInt(m_SelectedSquare), PieceMethods.UIntToInt(clickedSquare.BitPosition)
-                            );
+                        PlayerMadeMove?.Invoke(move);
                         break;
                     }
                 }
 
                 if (!isLegalMove)
                 {
-                    select(clickedSquare.BitPosition);
+                    onSelect(clickedSquare.BitPosition);
                 }
             }
         }
 
-        private void select(uint i_Selection)
+        private void onSelect(uint i_Selection)
         {
             clearMarkedSquares();
             m_SelectedSquare = i_Selection;
+            select(i_Selection);
+        }
+
+        private void select(uint i_Selection)
+        {
             // valid black square
             if (i_Selection != 0)
             {
                 markSquare(i_Selection);
-                foreach (IMove move in m_GameBoard.LegalMoves)
+                foreach (IMove move in GameMasterSingleton.Instance.Board.LegalMoves)
                 {
                     if (move.GetStartSquare() == i_Selection)
                     {
@@ -116,22 +123,49 @@ namespace ConsoleCheckers
         private void OnMadeMove(IMove i_Move)
         {
             clearMarkedSquares();
-            m_PositionToButtonDict[i_Move.GetStartSquare()].Draw();
-            m_PositionToButtonDict[i_Move.GetTargetSquare()].Draw();
+            m_PositionToButtonDict[i_Move.GetStartSquare()].Draw(GameMasterSingleton.Instance.Board);
+            m_PositionToButtonDict[i_Move.GetTargetSquare()].Draw(GameMasterSingleton.Instance.Board);
             if (i_Move.IsCapture())
             {
-                m_PositionToButtonDict[i_Move.GetCaptureSquare()].Draw();
+                m_PositionToButtonDict[i_Move.GetCaptureSquare()].Draw(GameMasterSingleton.Instance.Board);
                 updateTakenPiecesPanel();
             }
+
+            m_CurrentlyViewingPositionNumber++;
+        }
+
+        private void viewHistoryPosition(int i_PositionNumber)
+        {
+            if (i_PositionNumber + 1 != GameMasterSingleton.Instance.Board.PositionsHistory.Count)
+            {
+                GameMasterSingleton.Instance.Board.MadeMove -= OnMadeMove;
+                clearMarkedSquares();
+                SetInActiveState();
+                Board boardToView = new Board(GameMasterSingleton.Instance.Board.PositionsHistory[i_PositionNumber]);
+                foreach (CheckersButton button in panelCheckers.Controls)
+                {
+                    button.Draw(boardToView);
+                }
+            }
+            else
+            {
+                GameMasterSingleton.Instance.Board.MadeMove += OnMadeMove;
+                SetActiveState();
+                foreach (CheckersButton button in panelCheckers.Controls)
+                {
+                    button.Draw(GameMasterSingleton.Instance.Board);
+                }
+            }
+            
         }
 
         private void updateTakenPiecesPanel()
         {
-            if (m_GameBoard.Turn == eColor.White)
+            if (GameMasterSingleton.Instance.Board.Turn == eColor.White)
             {
                 panelWhiteCapture.AddImage();
             }
-            else if(m_GameBoard.Turn == eColor.Black)
+            else if(GameMasterSingleton.Instance.Board.Turn == eColor.Black)
             {
                 panelBlackCapture.AddImage();
             }
@@ -139,6 +173,7 @@ namespace ConsoleCheckers
 
         private void OnGameEnd(eColor i_Color)
         {
+            SetInActiveState();
             MessageBox.Show($"game has ended, the winner is {i_Color}");
         }
 
@@ -147,8 +182,32 @@ namespace ConsoleCheckers
             int limitValue = ((TrackBar)sender).Value;
             LabelQueenMoveLimit.Text = limitValue.ToString();
             GameMasterSingleton.Instance.QueenMoveLimit = limitValue;
-            m_GameBoard.GenerateLegalMoves();
-            this.select(m_SelectedSquare);
+            GameMasterSingleton.Instance.Board.GenerateLegalMoves();
+            this.onSelect(m_SelectedSquare);
+        }
+
+        public void SetActiveState()
+        {
+            isSelectionEnabled = true;
+        }
+
+        public void SetInActiveState()
+        {
+            isSelectionEnabled = false;
+        }
+
+        public void GameHasEnded()
+        {
+            OnGameEnd(GameMasterSingleton.Instance.Board.Turn);
+        }
+
+        public void Reset()
+        {
+            m_CurrentlyViewingPositionNumber = 0;
+            clearMarkedSquares();
+            panelWhiteCapture.ResetPanel();
+            panelBlackCapture.ResetPanel();
+            loadPieceImagesAndAddActions();
         }
     }
 }

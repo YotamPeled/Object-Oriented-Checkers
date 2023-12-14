@@ -17,13 +17,11 @@ namespace ConsoleCheckers
             {
                 if (pair.Item1 < 3)
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.sBlack;
                     i_Board.BitBoards[(int)ePiece.sBlack - 1] >>= 1;
                     i_Board.BitBoards[(int)ePiece.sBlack - 1] |= 1U << 31;
                 }
                 else 
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.sWhite;
                     i_Board.BitBoards[(int)ePiece.sWhite - 1] <<= 1;
                     i_Board.BitBoards[(int)ePiece.sWhite - 1] |= 1;
                 }
@@ -39,13 +37,11 @@ namespace ConsoleCheckers
             {
                 if (pair.Item1 < 3)
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.qBlack;
                     i_Board.BitBoards[(int)ePiece.qBlack - 1] >>= 1;
                     i_Board.BitBoards[(int)ePiece.qBlack - 1] |= 1U << 31;
                 }
                 else
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.qWhite;
                     i_Board.BitBoards[(int)ePiece.qWhite - 1] <<= 1;
                     i_Board.BitBoards[(int)ePiece.qWhite - 1] |= 1;
                 }
@@ -62,16 +58,22 @@ namespace ConsoleCheckers
                 counter++;
                 if (counter == 1)
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.qBlack;
                     i_Board.BitBoards[(int)ePiece.qBlack - 1] |= 1U << 31;
                 }
                 else
                 {
-                    i_Board[pair.Item1, pair.Item2] = ePiece.qWhite;
                     i_Board.BitBoards[(int)ePiece.qWhite - 1] |= 1U << 30;
                 }
             }
         }
+
+        public static void SetupDoubleCapture(Board i_Board)
+        {
+            // Set bitboard positions for the pieces
+            i_Board.BitBoards[(int)ePiece.sBlack - 1] = 0b00000100000000100000000000000000; // Bit representation for two black pieces
+            i_Board.BitBoards[(int)ePiece.sWhite - 1] = 0b00000000000000000010000000000000; // Bit representation for two white pieces
+        }
+
 
         static List<Tuple<int, int>> generatePairs(int n)
         {

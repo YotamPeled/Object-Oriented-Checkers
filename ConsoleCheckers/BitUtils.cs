@@ -8,17 +8,6 @@ namespace ConsoleCheckers
 {
     public static class BitUtils
     {
-        public static uint ExtractBits(uint number, int startBit, int endBit)
-        {
-            // Calculate the mask for the desired bits
-            uint mask = ((1U << (endBit - startBit + 1)) - 1) << startBit;
-
-            // Extract the bits using the mask
-            uint extractedBits = (number & mask) >> startBit;
-
-            return extractedBits;
-        }
-
         public static List<uint> GetSetBits(uint number)
         {
             List<uint> bitList = new List<uint>();

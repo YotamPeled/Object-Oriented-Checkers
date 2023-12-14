@@ -1,100 +1,150 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 
 namespace ConsoleCheckers
 {
     public static class PieceMethods
     {
-        public static List<IMove> GiveLegalMoves(uint[] i_BitBoards, eColor i_ColorToMove)
+        private static List<IMove> previousGeneration;
+
+        public static void ResetPreviousGeneration()
         {
-            List<IMove> moveList;          
-            moveList = generateMoves(i_BitBoards, i_ColorToMove);
+            previousGeneration.Clear();
+        }
+
+        public static List<IMove> GiveLegalMoves(uint[] i_BitBoards, eColor i_ColorToMove, bool i_IsDoubleCapture = false)
+        {
+            List<IMove> moveList = new List<IMove>();
+            if (previousGeneration != null)
+            {
+                giveDoubleCapturesAfterCapture(i_BitBoards, moveList);
+            }
             
+            if (moveList.Count == 0)
+            {
+                moveList = generateMoves(i_BitBoards, i_ColorToMove, i_IsDoubleCapture);
+            }
+
+            previousGeneration = moveList;
             return moveList;
         }
 
-        private static List<IMove> generateMoves(uint[] i_BitBoards, eColor i_Color)
+        private static void giveDoubleCapturesAfterCapture(uint[] i_BitBoards, List<IMove> moveList)
+        {
+            uint allPieces = i_BitBoards[0] | i_BitBoards[1] | i_BitBoards[2] | i_BitBoards[3];
+            List<IMove> doubleCaptureMoves = previousGeneration.Where(IMove => IMove.IsDoubleCapture()).ToList();
+            foreach (IMove move in doubleCaptureMoves)
+            {
+                // find the single move where double capture occured
+                if ((move.GetTargetSquare() & allPieces) != 0)
+                {
+                    moveList.AddRange(move.DoubleCapturesList);
+                    break;
+                }
+            }         
+        }
+
+        private static List<IMove> generateMoves(uint[] i_BitBoards, eColor i_Color, bool i_IsDoubleCapture)
         {
             List<IMove> movesList = new List<IMove>();
-            Func<uint, uint> moveLeft;
-            Func<uint, uint> moveRight;
-            Func<uint, uint> captureLeft;
-            Func<uint, uint> captureRight;
             bool isCaptureTurn = false; // Force Captures, if capture found list is cleared and isCaptureTurn becomes true
-            uint friendlyPieces;
-            uint opposingPieces;
-            uint soliders;
-            uint queens;
-
-            allocateBitBoards(i_Color, i_BitBoards, out friendlyPieces, out opposingPieces, out soliders, out queens);
-            foreach (uint piece in BitUtils.GetSetBits(soliders))
+            Func<uint, uint> moveLeft, moveRight, captureLeft, captureRight;
+            uint friendlyPieces, opposingPieces, soliders;
+            allocateBitBoards(i_Color, i_BitBoards, out friendlyPieces, out opposingPieces, out soliders, out _);
+            ePiece movingSolider = getSoliderPiece(i_Color);
+            foreach (uint soliderStartSquare in BitUtils.GetSetBits(soliders))
             {
-                int piecePosition = BitUtils.FindBitPosition(piece) % 8;
+                int piecePosition = BitUtils.FindBitPosition(soliderStartSquare) % 8;
                 ShiftingFunctionsFactory.GetShiftingFuncs(piecePosition, i_Color, out moveLeft, out moveRight,
                     out captureLeft, out captureRight);
                 // left capture check
-                if (captureLeft != null)
+                if (captureLeft != null && captureCheck(soliderStartSquare, opposingPieces, friendlyPieces, moveLeft, captureLeft))
                 {
-                    captureCheck(piece, opposingPieces, friendlyPieces, moveLeft,
-                    captureLeft, movesList, ref isCaptureTurn);
+                    if (!isCaptureTurn)
+                    {
+                        isCaptureTurn = doCaptureSeenDuringTurn(movesList);
+                    }
+
+                    IMove moveToAdd = makeMoveAfterCapture(i_Color, i_BitBoards, soliderStartSquare, moveLeft(soliderStartSquare),
+                                                           captureLeft(soliderStartSquare), movingSolider, i_Color);
+                    movesList.Add(moveToAdd);
                 }
                 // right capture check
-                if (captureRight != null)
+                if (captureRight != null && captureCheck(soliderStartSquare, opposingPieces, friendlyPieces, moveRight, captureRight))
                 {
-                    captureCheck(piece, opposingPieces, friendlyPieces, moveRight,
-                    captureRight, movesList, ref isCaptureTurn);
+                    if (!isCaptureTurn)
+                    {
+                        isCaptureTurn = doCaptureSeenDuringTurn(movesList);
+                    }
+
+                    IMove moveToAdd = makeMoveAfterCapture(i_Color, i_BitBoards, soliderStartSquare, moveRight(soliderStartSquare),
+                                                           captureRight(soliderStartSquare), movingSolider, i_Color);
+                    movesList.Add(moveToAdd);
                 }
+
                 // normal move left
-                if (!isCaptureTurn && moveLeft != null)
+                if (!i_IsDoubleCapture && !isCaptureTurn && moveLeft != null && normalMoveCheck(soliderStartSquare, friendlyPieces | opposingPieces, moveLeft))
                 {
-                    normalMoveCheck(piece, friendlyPieces | opposingPieces, moveLeft, movesList);
+                    movesList.Add(PackMove(soliderStartSquare, moveLeft(soliderStartSquare), movingSolider));
                 }
                 // normal move right
-                if (!isCaptureTurn && moveRight != null)
+                if (!i_IsDoubleCapture && !isCaptureTurn && moveRight != null && normalMoveCheck(soliderStartSquare, friendlyPieces | opposingPieces, moveRight))
                 {
-                    normalMoveCheck(piece, friendlyPieces | opposingPieces, moveRight, movesList);
+                    movesList.Add(PackMove(soliderStartSquare, moveRight(soliderStartSquare), movingSolider));
                 }
             }
 
-            foreach (uint queen in BitUtils.GetSetBits(queens))
+            queenMoves(i_BitBoards, isCaptureTurn, movesList, i_Color);
+            return movesList;
+        }
+
+        private static void queenMoves(uint[] i_BitBoards, bool i_IsCaptureTurn, List<IMove> i_Moves, eColor i_ColorTurn)
+        {
+            uint queens, friendly, opposing;
+            allocateBitBoards(i_ColorTurn, i_BitBoards, out friendly, out opposing, out _, out queens);
+            ePiece movingQueen = getQueenPiece(i_ColorTurn);
+            foreach (uint queenStartSquare in BitUtils.GetSetBits(queens))
             {
-                foreach (IEnumerable<uint> queenMovesIterator in ShiftingFunctionsFactory.GetQueenIterators(queen, opposingPieces))
+                foreach (IEnumerable<uint> queenMovesIterator in ShiftingFunctionsFactory.GetQueenIterators(queenStartSquare, opposing))
                 {
                     uint captureablePiece = 0;
-                    foreach (uint piece in queenMovesIterator)
+                    foreach (uint queenTargetSquare in queenMovesIterator)
                     {
-                        if (piece == 0)
+                        if (queenTargetSquare == 0)
                         {
                             break;
                         }
 
-                        if (((friendlyPieces | opposingPieces) & piece) == 0) // empty square check
+                        if (((friendly | opposing) & queenTargetSquare) == 0) // empty square check
                         {
                             if (captureablePiece != 0)
                             {
-                                if (!isCaptureTurn) // clear all none capture moves
+                                if (!i_IsCaptureTurn) // clear all none capture moves
                                 {
-                                    movesList.Clear();
-                                    isCaptureTurn = true;
+                                    i_IsCaptureTurn = doCaptureSeenDuringTurn(i_Moves);
                                 }
 
-                                movesList.Add(new MoveAdapter(new CheckersMove(queen, piece, captureablePiece)));
+                                IMove moveToAdd = makeMoveAfterCapture(i_ColorTurn, i_BitBoards, queenStartSquare, captureablePiece, queenTargetSquare, movingQueen, i_ColorTurn);
+                                i_Moves.Add(moveToAdd);
                                 break;
                             }
-                            else if (!isCaptureTurn)
+                            else if (!i_IsCaptureTurn)
                             {
-                                movesList.Add(new MoveAdapter(new CheckersMove(queen, piece)));
+                                i_Moves.Add(PackMove(queenStartSquare, queenTargetSquare, movingQueen));
                             }
                         }
-                        else if ((opposingPieces & piece) != 0) //enemy piece seen
+                        else if ((opposing & queenTargetSquare) != 0) //enemy piece seen
                         {
                             if (captureablePiece != 0) // 2 black pieces in a row seen
                             {
                                 break;
                             }
 
-                            captureablePiece = piece;
+                            captureablePiece = queenTargetSquare;
                         }
                         else //reached a friendly piece
                         {
@@ -103,38 +153,136 @@ namespace ConsoleCheckers
                     }
                 }
             }
-
-            return movesList;
         }
 
-        private static void normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc, List<IMove> i_MoveList)
+        private static bool normalMoveCheck(uint i_Piece, uint i_Board, Func<uint, uint> i_ShiftingFunc)
         {
+            bool isLegalMove = false;
             bool outOfBounds = i_ShiftingFunc(i_Piece) == 0;
             if (!outOfBounds && !isPieceInTheWay(i_Piece, i_Board, i_ShiftingFunc))
             {
-                i_MoveList.Add(new MoveAdapter(new CheckersMove(i_Piece, i_ShiftingFunc(i_Piece))));
+                isLegalMove = true;
             }
+
+            return isLegalMove;
         }
 
-        private static void captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, Func<uint, uint> i_2ndShiftingFunc, List<IMove> i_MoveList, ref bool io_IsCaptureTurn)
+        private static bool captureCheck(uint i_Piece, uint i_OpposingPieces, uint i_SamePieces, Func<uint, uint> i_ShiftingFunc, 
+            Func<uint, uint> i_2ndShiftingFunc)
         {
+            bool isLegalMove = false;
             bool outOfBounds = i_ShiftingFunc(i_Piece) == 0 || i_2ndShiftingFunc(i_Piece) == 0;
             if (!outOfBounds && isPieceInTheWay(i_Piece, i_OpposingPieces, i_ShiftingFunc) &&
                 !isPieceInTheWay(i_Piece, i_OpposingPieces | i_SamePieces, i_2ndShiftingFunc))
             {
-                if (!io_IsCaptureTurn)
-                {
-                    io_IsCaptureTurn = true;
-                    i_MoveList.Clear();
-                }
-
-                i_MoveList.Add(new MoveAdapter(new CheckersMove(i_Piece, i_2ndShiftingFunc(i_Piece), i_ShiftingFunc(i_Piece))));
+                isLegalMove = true;
             }
+
+            return isLegalMove;
+        }
+
+        private static IMove makeMoveAfterCapture(eColor i_Color, uint[] i_BitBoards, uint startSquare, uint capturedSquare, uint targetSquare, ePiece movingPiece, eColor movingPieceColor)
+        {
+            ePiece capturedPiece = getCapturedPieceType(i_Color, i_BitBoards, capturedSquare); 
+            IMove moveToAdd = PackMove(startSquare, targetSquare, movingPiece, capturedSquare, capturedPiece);
+            MakeMove(moveToAdd, i_BitBoards);
+            doubleCaptureCheck(moveToAdd, targetSquare, i_BitBoards, movingPieceColor);
+            unMakeMove(moveToAdd, i_BitBoards);
+
+            return moveToAdd;
+        }
+
+        private static void doubleCaptureCheck(IMove move, uint pieceLocation, uint[] i_BitBoards, eColor i_MovingPieceColor)
+        {
+            // checks front and back captures
+            ePiece movingPiece = getPieceType(pieceLocation, i_BitBoards);
+            uint friendly, opposing;
+            allocateBitBoards(i_MovingPieceColor, i_BitBoards, out friendly, out opposing, out _, out _);
+            Func<uint, uint> moveLeft, moveRight, captureLeft, captureRight;
+            int bitPosition = BitUtils.FindBitPosition(pieceLocation) % 8;
+            ShiftingFunctionsFactory.GetShiftingFuncs(bitPosition, eColor.White, out moveLeft, out moveRight, out captureLeft, out captureRight);
+            if (captureLeft != null && captureCheck(pieceLocation, opposing, friendly, moveLeft, captureLeft))
+            {
+                IMove moveToAdd = makeMoveAfterCapture(i_MovingPieceColor, i_BitBoards, pieceLocation, moveLeft(pieceLocation), captureLeft(pieceLocation), movingPiece, i_MovingPieceColor);
+                move.addDoubleCapture(moveToAdd);
+            }
+
+            if (captureRight != null && captureCheck(pieceLocation, opposing, friendly, moveRight, captureRight))
+            {
+                IMove moveToAdd = makeMoveAfterCapture(i_MovingPieceColor, i_BitBoards, pieceLocation, moveRight(pieceLocation), captureRight(pieceLocation), movingPiece, i_MovingPieceColor);
+                move.addDoubleCapture(moveToAdd);
+            }
+
+            ShiftingFunctionsFactory.GetShiftingFuncs(bitPosition, eColor.Black, out moveLeft, out moveRight, out captureLeft, out captureRight);
+            if (captureLeft != null && captureCheck(pieceLocation, opposing, friendly, moveLeft, captureLeft))
+            {
+                IMove moveToAdd = makeMoveAfterCapture(i_MovingPieceColor, i_BitBoards, pieceLocation, moveLeft(pieceLocation), captureLeft(pieceLocation), movingPiece, i_MovingPieceColor);
+                move.addDoubleCapture(moveToAdd);
+            }
+
+            if (captureRight != null && captureCheck(pieceLocation, opposing, friendly, moveRight, captureRight))
+            {
+                IMove moveToAdd = makeMoveAfterCapture(i_MovingPieceColor, i_BitBoards, pieceLocation, moveRight(pieceLocation), captureRight(pieceLocation), movingPiece, i_MovingPieceColor);
+                move.addDoubleCapture(moveToAdd);
+            }
+        }
+
+        private static ePiece getPieceType(uint pieceLocation, uint[] i_BitBoards)
+        {
+            ePiece movingPiece;
+            if ((pieceLocation & i_BitBoards[0]) != 0)
+            {
+                movingPiece = ePiece.sWhite;
+            }
+            else if ((pieceLocation & i_BitBoards[1]) != 0)
+            {
+                movingPiece = ePiece.sBlack;
+            }
+            else if ((pieceLocation & i_BitBoards[2]) != 0)
+            {
+                movingPiece = ePiece.qWhite;
+            }
+            else
+            {
+                movingPiece = ePiece.qBlack;
+            }
+
+            return movingPiece;
         }
 
         private static bool isPieceInTheWay(uint piece, uint allColorPieces, Func<uint, uint> i_Shift)
         {
             return (i_Shift(piece) & allColorPieces) != 0; 
+        }
+
+        private static ePiece getSoliderPiece(eColor i_Color)
+        {
+            if (i_Color == eColor.White)
+            {
+                return ePiece.sWhite;
+            }
+            else
+            {
+                return ePiece.sBlack;
+            }
+        }
+
+        private static ePiece getQueenPiece(eColor i_Color)
+        {
+            if (i_Color == eColor.White)
+            {
+                return ePiece.qWhite;
+            }
+            else
+            {
+                return ePiece.qBlack;
+            }
+        }
+
+        private static bool doCaptureSeenDuringTurn(List<IMove> movesList)
+        {
+            movesList.Clear();
+            return true;
         }
 
         public static int CoordinateToInt(int i, int j)
@@ -202,6 +350,56 @@ namespace ConsoleCheckers
                 o_Soliders = i_BitBoards[1];
                 o_Queens = i_BitBoards[3];
             }
+        }
+
+        private static IMove PackMove(uint i_StartSquare, uint i_TargetSquare, ePiece i_MovingPiece, uint i_CaptureSquare = 0b00000, ePiece i_CapturedPiece = 0b00)
+        {
+            int PieceValue = (int)i_MovingPiece - 1;
+            int CapturedPieceValue = i_CapturedPiece == ePiece.None ? 0 : (int)i_CapturedPiece - 1;
+            return new MoveAdapter(new CheckersMove(i_StartSquare, i_TargetSquare, PieceValue, i_CaptureSquare, CapturedPieceValue));
+        }
+
+        public static void MakeMove(IMove i_MoveToMake, uint[] i_BitBoards)
+        {
+            int movingPieceValue = i_MoveToMake.GetMovingPieceValue();
+            i_BitBoards[movingPieceValue] ^= i_MoveToMake.GetStartSquare() | i_MoveToMake.GetTargetSquare();
+            if (i_MoveToMake.IsPromotion())
+            {
+                // 2 = queen offset
+                i_BitBoards[movingPieceValue + 2] ^= i_MoveToMake.GetTargetSquare();
+                i_BitBoards[movingPieceValue] ^= i_MoveToMake.GetTargetSquare();
+            }
+
+            if (i_MoveToMake.IsCapture())
+            {
+                int capturedPieceValue = i_MoveToMake.GetCapturedPieceValue();
+                i_BitBoards[capturedPieceValue] ^= i_MoveToMake.GetCaptureSquare();
+            }
+        }
+
+        public static void unMakeMove(IMove i_MoveToMake, uint[] i_BitBoards)
+        {
+            MakeMove(i_MoveToMake, i_BitBoards);
+        }
+
+        private static ePiece getCapturedPieceType(eColor i_ColorTurn, uint[] i_BitBoards, uint captureablePiece)
+        {
+            ePiece capturedPieceType;
+            if (i_ColorTurn == eColor.White)
+            {
+                capturedPieceType = (i_BitBoards[(int)ePiece.sBlack - 1] & captureablePiece) != 0 ? ePiece.sBlack : ePiece.qBlack;
+            }
+            else
+            {
+                capturedPieceType = (i_BitBoards[(int)ePiece.sWhite - 1] & captureablePiece) != 0 ? ePiece.sWhite : ePiece.qWhite;
+            }
+
+            return capturedPieceType;
+        }
+
+        public static eColor SwapTurn(eColor i_Color)
+        {
+            return i_Color == eColor.White ? eColor.Black : eColor.White;
         }
     }
 }
