@@ -270,7 +270,7 @@ namespace ConsoleCheckers
             this.panelCheckers.Name = "panelCheckers";
             this.panelCheckers.Size = new System.Drawing.Size(650, 615);
             this.panelCheckers.TabIndex = 0;
-            panelCheckers.ChangeColor(30);
+            panelCheckers.ChangeColor(eColors.DarkGray);
             //
             //Computer Match
             //
@@ -288,7 +288,7 @@ namespace ConsoleCheckers
             buttonPreviousMove.TabIndex = 0;
             buttonPreviousMove.Text = "Prev";
             buttonPreviousMove.UseVisualStyleBackColor = true;
-            buttonPreviousMove.SelectThemeColor(32);
+            buttonPreviousMove.SelectThemeColor(eColors.DarkGrayAlternate);
             buttonPreviousMove.Click += ButtonPrev_Click;
             // 
             // buttonNextMove
@@ -299,7 +299,7 @@ namespace ConsoleCheckers
             buttonNextMove.TabIndex = 1;
             buttonNextMove.Text = "Next";
             buttonNextMove.UseVisualStyleBackColor = true;
-            buttonNextMove.SelectThemeColor(32);
+            buttonNextMove.SelectThemeColor(eColors.DarkGrayAlternate);
             buttonNextMove.Click += ButtonNext_Click;
 
             panelChooseOponent.Controls.Add(buttonChooseComputerGame);
@@ -309,7 +309,7 @@ namespace ConsoleCheckers
             panelChooseOponent.Name = "panelChooseOponent";
             panelChooseOponent.Size = new Size(542, 193);
             panelChooseOponent.TabIndex = 0;
-            panelChooseOponent.ChangeColor(30);
+            panelChooseOponent.ChangeColor(eColors.DarkGray);
             // 
             // buttonChoose2Player
             // 
@@ -319,7 +319,7 @@ namespace ConsoleCheckers
             buttonChoose2Player.TabIndex = 0;
             buttonChoose2Player.Text = "2 Player";
             buttonChoose2Player.UseVisualStyleBackColor = true;
-            buttonChoose2Player.SelectThemeColor(7);
+            buttonChoose2Player.SelectThemeColor(eColors.SoftRed);
             buttonChoose2Player.Click += ButtonStart2PlayerMatch_Click;
             // 
             // buttonChooseComputer
@@ -330,7 +330,7 @@ namespace ConsoleCheckers
             buttonChooseComputer.TabIndex = 1;
             buttonChooseComputer.Text = "1 Player";
             buttonChooseComputer.UseVisualStyleBackColor = true;
-            buttonChooseComputer.SelectThemeColor(8);
+            buttonChooseComputer.SelectThemeColor(eColors.ReddishPurple);
             buttonChooseComputer.Click += ButtonHumanVsComputer_Click;
             // 
             // buttonChooseComputerGame
@@ -341,7 +341,7 @@ namespace ConsoleCheckers
             buttonChooseComputerGame.TabIndex = 2;
             buttonChooseComputerGame.Text = "Computer Game";
             buttonChooseComputerGame.UseVisualStyleBackColor = true;
-            buttonChooseComputerGame.SelectThemeColor(17);
+            buttonChooseComputerGame.SelectThemeColor(eColors.MutedPink);
             buttonChooseComputerGame.Click += ButtonComputerMatch_Click;
             // 
             // CheckersButton8
@@ -416,7 +416,7 @@ namespace ConsoleCheckers
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(137, 615);
             this.panel2.TabIndex = 1;
-            panel2.ChangeColor(30);
+            panel2.ChangeColor(eColors.DarkGray);
             // 
             // panel3
             // 
@@ -881,7 +881,7 @@ namespace ConsoleCheckers
             this.ButtonGameSettings.TabIndex = 0;
             this.ButtonGameSettings.UseVisualStyleBackColor = true;
             this.ButtonGameSettings.Text = "Game Settings";
-            ButtonGameSettings.SelectThemeColor(32);
+            ButtonGameSettings.SelectThemeColor(eColors.DarkGrayAlternate);
             ButtonGameSettings.Click += ButtonGameSettings_Click;
             // 
             // CheckersButton67
@@ -892,13 +892,13 @@ namespace ConsoleCheckers
             this.QuitButton.TabIndex = 2;
             this.QuitButton.UseVisualStyleBackColor = true;
             QuitButton.Text = "Quit";
-            QuitButton.SelectThemeColor(8);
+            QuitButton.SelectThemeColor(eColors.ReddishPurple);
             QuitButton.Click += ButtonQuit_Click;
             //
             //Button Close Panel
             //
             ButtonClosePanel = new YotamButton();
-            this.ButtonClosePanel.SelectThemeColor(8);
+            this.ButtonClosePanel.SelectThemeColor(eColors.ReddishPurple);
             ButtonClosePanel.Name = "ButtonClosePanel";
             ButtonClosePanel.Size = this.QuitButton.Size = new System.Drawing.Size(131, 71);
             ButtonClosePanel.Location = new Point(3, 541);
@@ -906,13 +906,13 @@ namespace ConsoleCheckers
             ButtonClosePanel.Click += ButtonClosePanel_Click;
 
             ComputerMatch = new YotamButton();
-            ComputerMatch.SelectThemeColor(17);
+            ComputerMatch.SelectThemeColor(eColors.MutedPink);
             ComputerMatch.Location = ButtonGameSettings.Location;
             ComputerMatch.Size = ButtonGameSettings.Size;
             ComputerMatch.Text = "Enable Computer Match";
             ComputerMatch.Click += ButtonComputerMatch_Click;
 
-            ButtonStartMatch.SelectThemeColor(24);
+            ButtonStartMatch.SelectThemeColor(eColors.Green);
             ButtonStartMatch.Location = new Point(12, 137); 
             ButtonStartMatch.Size = new Size(518, 44);
             ButtonStartMatch.Text = "Start";
@@ -925,7 +925,7 @@ namespace ConsoleCheckers
             buttonExit.UseVisualStyleBackColor = true;
             buttonExit.TextAlign = ContentAlignment.MiddleCenter; // Align text to the center
             buttonExit.Click += ButtonExit_Click;
-            buttonExit.SelectThemeColor(8);
+            buttonExit.SelectThemeColor(eColors.ReddishPurple);
 
             labelDepth.AutoSize = true;
             labelDepth.Location = new Point(239, 24);
@@ -1009,8 +1009,8 @@ namespace ConsoleCheckers
             panelWhiteCapture.Location = new Point(panelCheckers.Location.X, panelCheckers.Bottom + 5);
             panelWhiteCapture.Size = new Size(panelCheckers.Width, 30);
             panelBlackCapture.Size = new Size(panelCheckers.Width, 30);
-            panelBlackCapture.ChangeColor(31);
-            panelWhiteCapture.ChangeColor(31);
+            panelBlackCapture.ChangeColor(eColors.MediumGray);
+            panelWhiteCapture.ChangeColor(eColors.MediumGray);
             panelWhiteCapture.BorderStyle = BorderStyle.FixedSingle;
             panelBlackCapture.BorderStyle = BorderStyle.FixedSingle;
             panelBlackCapture.Image = Images.white_pawn_icon;
@@ -1019,7 +1019,7 @@ namespace ConsoleCheckers
             //panel game settings and it's components
             //
             panelGameSettings.Size = panel2.Size;
-            panelGameSettings.ChangeColor(32);
+            panelGameSettings.ChangeColor(eColors.DarkGrayAlternate);
             LabelQueenMoveLimit = new Label();
             LabelQueenLimitText = new Label();
             TrackBarQueenMoveLimit = new TrackBar();
@@ -1030,7 +1030,7 @@ namespace ConsoleCheckers
             // panel computer settings
             //
             panelCompueterSettings.Size = panel2.Size;
-            panelCompueterSettings.ChangeColor(32);
+            panelCompueterSettings.ChangeColor(eColors.DarkGrayAlternate);
             panelCompueterSettings.Controls.Add(ComputerMatch);
             panelCompueterSettings.Controls.Add(ButtonStartMatch);
             panelCompueterSettings.Controls.Add(labelDepth);
@@ -1084,7 +1084,7 @@ namespace ConsoleCheckers
             // 
             this.ClientSize = new System.Drawing.Size(941, 714);
             mainPanel.Size = this.Size;
-            mainPanel.ChangeColor(31);
+            mainPanel.ChangeColor(eColors.MediumGray);
             this.mainPanel.Controls.Add(panel3);
             this.mainPanel.Controls.Add(panel2);
             this.mainPanel.Controls.Add(panelCheckers);

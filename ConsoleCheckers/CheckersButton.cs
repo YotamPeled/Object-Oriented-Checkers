@@ -9,7 +9,7 @@ using YotamControls;
 
 namespace ConsoleCheckers
 {
-    internal class CheckersButton : YotamButton
+    public class CheckersButton : YotamButton
     {
         private int m_ImageLength = 100;
         private uint m_BitPosition;
@@ -19,27 +19,42 @@ namespace ConsoleCheckers
         {
             m_BitPosition = i_bitPosition;         
             tag = PieceMethods.UIntToInt(m_BitPosition);
-            selectBackColor();
+            selectOriginalBackColor();
         }
 
-        private void selectBackColor()
+        public void selectOriginalBackColor()
         {
-            int colorIndex;
+            eColors color;
             if (UIUtils.isBackColorWhite(m_BitPosition))
             {
-                colorIndex = 27;
+                color = eColors.OffWhite;
             }
             else
             {
-                colorIndex = 28;
+                color = eColors.Brown;
             }
 
-            SelectThemeColor(colorIndex);
+            SelectThemeColor(color);
         }
 
         public new void Select()
         {
             ImageUtils.DrawCircleOnButton(this);
+        }
+
+        public void UnSelect()
+        {
+            ImageUtils.ClearCircleFromButton(this);
+        }
+
+        public void drawMoveHighlight()
+        {
+            SelectThemeColor(eColors.LightYellow);
+        }
+
+        public void drawCaptureHighlight()
+        {
+            SelectThemeColor(eColors.LightRed);
         }
 
         public void Draw(Board i_Board)

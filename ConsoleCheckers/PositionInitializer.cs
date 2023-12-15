@@ -74,6 +74,13 @@ namespace ConsoleCheckers
             i_Board.BitBoards[(int)ePiece.sWhite - 1] = 0b00000000000000000010000000000000; // Bit representation for two white pieces
         }
 
+        public static void DoubleCaptureBugTest(Board i_Board)
+        {
+            i_Board.BitBoards[(int)ePiece.sBlack - 1] = 0b00000000000000000000000001000000; // Bit representation for two black pieces
+            i_Board.BitBoards[(int)ePiece.sWhite - 1] = 0b00000000000000000000000000000110; // Bit representation for two white pieces
+            i_Board.BitBoards[(int)ePiece.qBlack - 1] = 0b00000000000000000000000000100000;
+        }
+
 
         static List<Tuple<int, int>> generatePairs(int n)
         {

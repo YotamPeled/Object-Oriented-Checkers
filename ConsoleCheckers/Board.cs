@@ -10,6 +10,7 @@ namespace ConsoleCheckers
 {
     public class Board
     {
+        private MoveGeneratorDecorator m_MoveGenerator = new MoveGeneratorWithMoveHistoryDecorator(new MoveGenerator());
         public List<uint[]> PositionsHistory { get; } = new List<uint[]>();
         private bool m_OngoingGame = true;
         public bool GameOngoing { get { return m_OngoingGame; } }
@@ -114,7 +115,7 @@ namespace ConsoleCheckers
 
         public void GenerateLegalMoves(bool isDoubleCapture = false)
         {  
-            m_LegalMoves = PieceMethods.GiveLegalMoves(BitBoards, m_ColorTurn, isDoubleCapture);
+            m_LegalMoves = m_MoveGenerator.GiveLegalMoves(BitBoards, m_ColorTurn);
         }
 
         public bool MakeMove(IMove i_Move)

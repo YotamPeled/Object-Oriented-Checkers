@@ -17,12 +17,13 @@ namespace ConsoleCheckers
         private bool m_GameHasEnded = false;
         private int Computer1Score = 0;
         private int Computer2Score = 0;
-        public CheckersComputerMatchManager(Board i_Board, bool m_Starting = true)
+        public CheckersComputerMatchManager(Board i_Board, bool i_Computer1StartingStarting)
         {
             m_Board = i_Board;
             signUpForEvents();
             Computer1 = new CheckersComputer();
             Computer2 = new CheckersComputer();
+            m_Turn = i_Computer1StartingStarting;
         }
 
         private void signUpForEvents()

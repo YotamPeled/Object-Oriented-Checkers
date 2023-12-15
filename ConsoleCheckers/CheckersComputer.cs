@@ -11,7 +11,7 @@ namespace ConsoleCheckers
         private Func<uint[], int> EvaluationStrategyMethod;
         public IMove BestMove { get; set; }
         private uint[] m_BitBoards;
-        private bool isDoubleCapture = false;
+        private IMoveGenerator m_MoveGenerator = new MoveGenerator();
 
         public void GenerateMove()
         {
@@ -22,7 +22,7 @@ namespace ConsoleCheckers
             searchDepth += addDepth(pieceCount);
             EvaluationNode bestEvaluation = new EvaluationNode() { evaluation = lostPositionEvaluation(colorToMove), depth = -1 };
             Func<int, int, int> evaluatingFunc = getMaxingFunc(colorToMove);
-            foreach(IMove move in PieceMethods.GiveLegalMoves(m_BitBoards, colorToMove, isDoubleCapture))
+            foreach(IMove move in GameMasterSingleton.Instance.Board.LegalMoves)
             {
                 PieceMethods.MakeMove(move, m_BitBoards);
                 eColor movingColor = move.IsDoubleCapture() ? colorToMove : PieceMethods.SwapTurn(colorToMove);
@@ -35,8 +35,6 @@ namespace ConsoleCheckers
                     BestMove = move;
                 }
             }
-
-            isDoubleCapture = BestMove.IsDoubleCapture();
         }
 
         private EvaluationNode MiniMax(int i_Depth, eColor colorTurn, int numExtensions = 0, int alpha = int.MinValue, int beta = int.MaxValue)
@@ -48,7 +46,7 @@ namespace ConsoleCheckers
                 return node;
             }
 
-            List<IMove> moves = PieceMethods.GiveLegalMoves(m_BitBoards, colorTurn);
+            List<IMove> moves = m_MoveGenerator.GiveLegalMoves(m_BitBoards, colorTurn);
             if(moves.Count == 0)
             {
                 return new EvaluationNode() { evaluation = lostPositionEvaluation(colorTurn), depth = i_Depth};
