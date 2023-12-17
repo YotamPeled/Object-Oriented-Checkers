@@ -11,3 +11,5 @@ The Computer's position evaluation function is a simple material count function 
 
 The search algorithm I utilized was MiniMax, which was optimized using alpha-beta pruning. 
 Further optimizations can be made on the algorithm by using iterative deepening and using a transposition table.
+
+Frontend was implimented using WinForms and implimenting custom WinFroms Controls 
