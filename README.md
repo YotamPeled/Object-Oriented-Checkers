@@ -1,4 +1,4 @@
-This is a Checkers project I did to showcase my knowledge of object oriented design principals and to practice problem solving.
+This is a Checkers project I did to showcase my knowledge of object oriented design principals, practice problem solving and using BitBoards.
 The final product is a checkers game with 3 playing modes:
 - 2 player
 - Player vs Computer
