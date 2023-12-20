@@ -5,7 +5,7 @@ The final product is a checkers game with 3 playing modes:
 - Computer vs Computer
 When a computer participates in the play, you can select the computer's strength.
 
-Design Patters Used in the project:
+Design Patterns Used in the project:
 Singleton, static factory, Adapter, Decorator, Template Method, Strategy Method, Observer, Command.
 The Computer's position evaluation function is a simple material count function and can be easily changed dynamically (thanks to the strategy pattern).
 
